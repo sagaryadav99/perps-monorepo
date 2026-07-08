@@ -1,0 +1,444 @@
+{
+  "insurancefund": {
+    "fund": 0
+  },
+  "users": [
+    {
+      "userId": "da2e072e-26e9-4b05-b809-491c0667fb49",
+      "collateral": {
+        "available": 996550.5,
+        "locked": 3449.5
+      },
+      "orders": [
+        {
+          "orderId": "758c076f-45c5-43fa-a4f0-88fbe2750c14",
+          "market": "SOL",
+          "type": "limit",
+          "qty": 5,
+          "margin": 242.5,
+          "filledQty": 0,
+          "remainingQty": 5,
+          "leverage": 2,
+          "orderType": "long",
+          "price": 97,
+          "status": "Open",
+          "createdAt": "2026-06-13T07:37:21.860Z"
+        },
+        {
+          "orderId": "08cedc6e-a886-4307-8564-f0b4172cc985",
+          "market": "SOL",
+          "type": "limit",
+          "qty": 3,
+          "margin": 144,
+          "filledQty": 0,
+          "remainingQty": 3,
+          "leverage": 2,
+          "orderType": "long",
+          "price": 96,
+          "status": "Open",
+          "createdAt": "2026-06-13T07:39:00.092Z"
+        },
+        {
+          "orderId": "7734fd2c-7fc0-4a56-aaef-e38901afe668",
+          "market": "SOL",
+          "type": "limit",
+          "qty": 4,
+          "margin": 208,
+          "filledQty": 0,
+          "remainingQty": 4,
+          "leverage": 2,
+          "orderType": "short",
+          "price": 104,
+          "status": "Open",
+          "createdAt": "2026-06-13T07:39:17.345Z"
+        },
+        {
+          "orderId": "e97d0514-15e7-402a-be2f-0cb8881b5bac",
+          "market": "ETH",
+          "type": "limit",
+          "qty": 1,
+          "margin": 945,
+          "filledQty": 0,
+          "remainingQty": 1,
+          "leverage": 2,
+          "orderType": "long",
+          "price": 1890,
+          "status": "Open",
+          "createdAt": "2026-06-13T07:39:34.405Z"
+        },
+        {
+          "orderId": "d79b699f-12ad-4fa3-99f0-ff27bf05ed17",
+          "market": "ETH",
+          "type": "limit",
+          "qty": 2,
+          "margin": 1910,
+          "filledQty": 0,
+          "remainingQty": 2,
+          "leverage": 2,
+          "orderType": "short",
+          "price": 1910,
+          "status": "Open",
+          "createdAt": "2026-06-13T07:39:47.217Z"
+        }
+      ]
+    },
+    {
+      "userId": "bb35689c-03a6-4c58-8378-c85154a3b7cb",
+      "collateral": {
+        "available": 996216,
+        "locked": 3784
+      },
+      "orders": [
+        {
+          "orderId": "9da8c357-2e3c-4c7a-b6e4-6aba966db4d0",
+          "market": "SOL",
+          "type": "limit",
+          "qty": 10,
+          "margin": 475,
+          "filledQty": 0,
+          "remainingQty": 10,
+          "leverage": 2,
+          "orderType": "long",
+          "price": 95,
+          "status": "Open",
+          "createdAt": "2026-06-13T07:41:19.270Z"
+        },
+        {
+          "orderId": "36df1234-1a14-44f4-ab12-3f37e0560470",
+          "market": "SOL",
+          "type": "limit",
+          "qty": 6,
+          "margin": 309,
+          "filledQty": 0,
+          "remainingQty": 6,
+          "leverage": 2,
+          "orderType": "short",
+          "price": 103,
+          "status": "Open",
+          "createdAt": "2026-06-13T07:41:29.084Z"
+        },
+        {
+          "orderId": "edb5d6ca-8067-4b25-ac67-bebe8fb249df",
+          "market": "SOL",
+          "type": "limit",
+          "qty": 3,
+          "margin": 157.5,
+          "filledQty": 0,
+          "remainingQty": 3,
+          "leverage": 2,
+          "orderType": "short",
+          "price": 105,
+          "status": "Open",
+          "createdAt": "2026-06-13T07:41:35.159Z"
+        },
+        {
+          "orderId": "005749f2-4eb8-4e59-accd-9abac9af94cc",
+          "market": "ETH",
+          "type": "limit",
+          "qty": 2,
+          "margin": 1885,
+          "filledQty": 0,
+          "remainingQty": 2,
+          "leverage": 2,
+          "orderType": "long",
+          "price": 1885,
+          "status": "Open",
+          "createdAt": "2026-06-13T07:41:41.732Z"
+        },
+        {
+          "orderId": "21d9e02c-19a8-4382-8c85-0a826a3f35e5",
+          "market": "ETH",
+          "type": "limit",
+          "qty": 1,
+          "margin": 957.5,
+          "filledQty": 0,
+          "remainingQty": 1,
+          "leverage": 2,
+          "orderType": "short",
+          "price": 1915,
+          "status": "Open",
+          "createdAt": "2026-06-13T07:41:47.925Z"
+        }
+      ]
+    },
+    {
+      "userId": "7164f951-3173-4d1e-b504-0cb70b1ac028",
+      "collateral": {
+        "available": 993681.5,
+        "locked": 6318.5
+      },
+      "orders": [
+        {
+          "orderId": "5a8703ac-6b94-4be1-9d84-d247ffed48cd",
+          "market": "SOL",
+          "type": "limit",
+          "qty": 8,
+          "margin": 376,
+          "filledQty": 0,
+          "remainingQty": 8,
+          "leverage": 2,
+          "orderType": "long",
+          "price": 94,
+          "status": "Open",
+          "createdAt": "2026-06-13T07:42:28.166Z"
+        },
+        {
+          "orderId": "2954336c-0251-46b5-ad27-4489d9cf33c3",
+          "market": "SOL",
+          "type": "limit",
+          "qty": 5,
+          "margin": 255,
+          "filledQty": 0,
+          "remainingQty": 5,
+          "leverage": 2,
+          "orderType": "short",
+          "price": 102,
+          "status": "Open",
+          "createdAt": "2026-06-13T07:42:35.091Z"
+        },
+        {
+          "orderId": "e1140cb6-6fd0-4189-8179-31ab98587ca9",
+          "market": "ETH",
+          "type": "limit",
+          "qty": 3,
+          "margin": 2820,
+          "filledQty": 0,
+          "remainingQty": 3,
+          "leverage": 2,
+          "orderType": "long",
+          "price": 1880,
+          "status": "Open",
+          "createdAt": "2026-06-13T07:42:40.577Z"
+        },
+        {
+          "orderId": "a572cc1d-1567-47e3-be88-60135480efe9",
+          "market": "ETH",
+          "type": "limit",
+          "qty": 2,
+          "margin": 1920,
+          "filledQty": 0,
+          "remainingQty": 2,
+          "leverage": 2,
+          "orderType": "short",
+          "price": 1920,
+          "status": "Open",
+          "createdAt": "2026-06-13T07:42:48.338Z"
+        },
+        {
+          "orderId": "e3bdc893-2eaa-4fca-b471-c6504ec57041",
+          "market": "ETH",
+          "type": "limit",
+          "qty": 1,
+          "margin": 947.5,
+          "filledQty": 0,
+          "remainingQty": 1,
+          "leverage": 2,
+          "orderType": "long",
+          "price": 1895,
+          "status": "Open",
+          "createdAt": "2026-06-13T07:42:53.937Z"
+        }
+      ]
+    }
+  ],
+  "positions": [],
+  "orderbooks": {
+    "SOL": {
+      "bids": {
+        "94": {
+          "availableQty": 8,
+          "openOrders": [
+            {
+              "userId": "7164f951-3173-4d1e-b504-0cb70b1ac028",
+              "orderId": "5a8703ac-6b94-4be1-9d84-d247ffed48cd",
+              "qty": 8,
+              "filledQty": 0,
+              "createdAt": "2026-06-13T07:42:28.167Z"
+            }
+          ]
+        },
+        "95": {
+          "availableQty": 10,
+          "openOrders": [
+            {
+              "userId": "bb35689c-03a6-4c58-8378-c85154a3b7cb",
+              "orderId": "9da8c357-2e3c-4c7a-b6e4-6aba966db4d0",
+              "qty": 10,
+              "filledQty": 0,
+              "createdAt": "2026-06-13T07:41:19.271Z"
+            }
+          ]
+        },
+        "96": {
+          "availableQty": 3,
+          "openOrders": [
+            {
+              "userId": "da2e072e-26e9-4b05-b809-491c0667fb49",
+              "orderId": "08cedc6e-a886-4307-8564-f0b4172cc985",
+              "qty": 3,
+              "filledQty": 0,
+              "createdAt": "2026-06-13T07:39:00.093Z"
+            }
+          ]
+        },
+        "97": {
+          "availableQty": 5,
+          "openOrders": [
+            {
+              "userId": "da2e072e-26e9-4b05-b809-491c0667fb49",
+              "orderId": "758c076f-45c5-43fa-a4f0-88fbe2750c14",
+              "qty": 5,
+              "filledQty": 0,
+              "createdAt": "2026-06-13T07:37:21.864Z"
+            }
+          ]
+        }
+      },
+      "asks": {
+        "102": {
+          "availableQty": 5,
+          "openOrders": [
+            {
+              "userId": "7164f951-3173-4d1e-b504-0cb70b1ac028",
+              "orderId": "2954336c-0251-46b5-ad27-4489d9cf33c3",
+              "qty": 5,
+              "filledQty": 0,
+              "createdAt": "2026-06-13T07:42:35.091Z"
+            }
+          ]
+        },
+        "103": {
+          "availableQty": 6,
+          "openOrders": [
+            {
+              "userId": "bb35689c-03a6-4c58-8378-c85154a3b7cb",
+              "orderId": "36df1234-1a14-44f4-ab12-3f37e0560470",
+              "qty": 6,
+              "filledQty": 0,
+              "createdAt": "2026-06-13T07:41:29.084Z"
+            }
+          ]
+        },
+        "104": {
+          "availableQty": 4,
+          "openOrders": [
+            {
+              "userId": "da2e072e-26e9-4b05-b809-491c0667fb49",
+              "orderId": "7734fd2c-7fc0-4a56-aaef-e38901afe668",
+              "qty": 4,
+              "filledQty": 0,
+              "createdAt": "2026-06-13T07:39:17.346Z"
+            }
+          ]
+        },
+        "105": {
+          "availableQty": 3,
+          "openOrders": [
+            {
+              "userId": "bb35689c-03a6-4c58-8378-c85154a3b7cb",
+              "orderId": "edb5d6ca-8067-4b25-ac67-bebe8fb249df",
+              "qty": 3,
+              "filledQty": 0,
+              "createdAt": "2026-06-13T07:41:35.160Z"
+            }
+          ]
+        }
+      },
+      "lastTradedPrice": 100,
+      "indexPrice": 99
+    },
+    "ETH": {
+      "bids": {
+        "1880": {
+          "availableQty": 3,
+          "openOrders": [
+            {
+              "userId": "7164f951-3173-4d1e-b504-0cb70b1ac028",
+              "orderId": "e1140cb6-6fd0-4189-8179-31ab98587ca9",
+              "qty": 3,
+              "filledQty": 0,
+              "createdAt": "2026-06-13T07:42:40.578Z"
+            }
+          ]
+        },
+        "1885": {
+          "availableQty": 2,
+          "openOrders": [
+            {
+              "userId": "bb35689c-03a6-4c58-8378-c85154a3b7cb",
+              "orderId": "005749f2-4eb8-4e59-accd-9abac9af94cc",
+              "qty": 2,
+              "filledQty": 0,
+              "createdAt": "2026-06-13T07:41:41.733Z"
+            }
+          ]
+        },
+        "1890": {
+          "availableQty": 1,
+          "openOrders": [
+            {
+              "userId": "da2e072e-26e9-4b05-b809-491c0667fb49",
+              "orderId": "e97d0514-15e7-402a-be2f-0cb8881b5bac",
+              "qty": 1,
+              "filledQty": 0,
+              "createdAt": "2026-06-13T07:39:34.406Z"
+            }
+          ]
+        },
+        "1895": {
+          "availableQty": 1,
+          "openOrders": [
+            {
+              "userId": "7164f951-3173-4d1e-b504-0cb70b1ac028",
+              "orderId": "e3bdc893-2eaa-4fca-b471-c6504ec57041",
+              "qty": 1,
+              "filledQty": 0,
+              "createdAt": "2026-06-13T07:42:53.937Z"
+            }
+          ]
+        }
+      },
+      "asks": {
+        "1910": {
+          "availableQty": 2,
+          "openOrders": [
+            {
+              "userId": "da2e072e-26e9-4b05-b809-491c0667fb49",
+              "orderId": "d79b699f-12ad-4fa3-99f0-ff27bf05ed17",
+              "qty": 2,
+              "filledQty": 0,
+              "createdAt": "2026-06-13T07:39:47.217Z"
+            }
+          ]
+        },
+        "1915": {
+          "availableQty": 1,
+          "openOrders": [
+            {
+              "userId": "bb35689c-03a6-4c58-8378-c85154a3b7cb",
+              "orderId": "21d9e02c-19a8-4382-8c85-0a826a3f35e5",
+              "qty": 1,
+              "filledQty": 0,
+              "createdAt": "2026-06-13T07:41:47.926Z"
+            }
+          ]
+        },
+        "1920": {
+          "availableQty": 2,
+          "openOrders": [
+            {
+              "userId": "7164f951-3173-4d1e-b504-0cb70b1ac028",
+              "orderId": "a572cc1d-1567-47e3-be88-60135480efe9",
+              "qty": 2,
+              "filledQty": 0,
+              "createdAt": "2026-06-13T07:42:48.339Z"
+            }
+          ]
+        }
+      },
+      "lastTradedPrice": 1900,
+      "indexPrice": 1899.9
+    }
+  },
+  "lastProcessedId": "$"
+}

@@ -1,0 +1,25 @@
+{
+  "name": "backend",
+  "module": "src/index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/express": "^5.0.6",
+    "@types/redis": "^4.0.11"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "scripts": {
+    "dev": "bun run src/index.ts"
+  },
+  "dependencies": {
+    "@perps-monorepo/shared": "workspace:*",
+    "@repo/db": "workspace:*",
+    "@types/jsonwebtoken": "^9.0.10",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "redis": "^6.0.0"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "dbpoller",
+  "module": "src/index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "^1.3.14",
+    "@types/node": "^25.9.3",
+    "@types/redis": "^4.0.11"
+  },
+  "scripts": {
+    "dev": "bun run src/index.ts"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@repo/db": "workspace:*",
+    "@perps-monorepo/shared": "workspace:*",
+    "redis": "^6.0.0"
+  }
+}

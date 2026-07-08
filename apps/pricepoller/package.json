@@ -1,0 +1,21 @@
+{
+  "name": "pricepoller",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/redis": "^4.0.11",
+    "@types/ws": "^8.18.1"
+  },
+  "scripts": {
+    "dev": "bun run src/index.ts"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "redis": "^6.0.0",
+    "ws": "^8.21.0"
+  }
+}

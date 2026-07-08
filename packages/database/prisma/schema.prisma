@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User{
+  id            String       @id @default(uuid())
+  username      String       @unique
+  password      String 
+  orders        Order[]
+  makerFills    Fill[]       @relation("maker_user")
+  takerFills    Fill[]       @relation("taker_user")
+}
+model Market{
+  id            String       @id @default(uuid())
+  slug          String
+  imageurl      String
+}
+
+model Order{
+  id            String       @id @default(uuid())
+  userId        String
+  market_id     String
+  orderType     orderType
+  type          Side 
+  price         Int 
+  qty           Int
+  initialMargin Int
+  filledQty     Int
+  remainingQty  Int
+  leverage      Int
+  status        orderStatus
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt()
+  user          User         @relation(fields:[userId],references:[id])
+  maker_fills    Fill[]       @relation("maker")
+  taker_fills    Fill[]       @relation("taker")
+}
+model Fill{
+  id            String       @id @default(uuid())
+  marketId      String
+  price         Int
+  qty           Int
+  takerUserId   String
+  makerUserId   String
+  takerOrderId  String
+  makerOrderId  String
+  takerSide     Side
+  createdAt     DateTime     @default(now())
+  taker_order   Order        @relation("taker",fields:[takerOrderId],references: [id])
+  maker_order   Order        @relation("maker",fields:[makerOrderId],references: [id])
+  taker_user    User         @relation("taker_user",fields: [takerUserId],references: [id])
+  maker_user    User         @relation("maker_user",fields:[makerUserId],references: [id])
+}
+enum orderStatus{
+  Cancelled
+  Filled
+  PartiallyFilled
+  Open
+}
+enum Side{
+  Long
+  Short
+}
+enum orderType{
+  Market
+  Limit
+}
