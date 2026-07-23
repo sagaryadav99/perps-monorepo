@@ -6,7 +6,7 @@ export function authmiddleware(
   next: NextFunction,
 ) {
   try {
-    const token = req.headers["authorization"];
+    const token = req.cookies.token;
     if (!token) {
       throw new Error("no token provided");
     }

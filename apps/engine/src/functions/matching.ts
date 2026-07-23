@@ -9,6 +9,11 @@ export function matching(
   type: string,
 ) {
   const fills: Fill[] = [];
+  const depthChanges: {
+    side: "bid" | "ask";
+    price: number;
+    quantity: number;
+  }[] = [];
   let marketorderbook = orderbooks[market];
   const user = users.find((x) => x.userId === userId);
   if (!user) {
@@ -34,11 +39,11 @@ export function matching(
     }, 0);
     if (currorder.qty > totalAvailableQty) {
       cancelOrder(user.userId, orderId, currorder.remainingQty);
-      return [];
+      return { fills: [], depthChanges: [] };
     }
     if (numkeys.length === 0 || !numkeys) {
       cancelOrder(userId, orderId, currorder.remainingQty);
-      return fills;
+      return { fills, depthChanges };
     }
     for (let i = 0; i < numkeys.length; i++) {
       const price = numkeys[i];
@@ -77,6 +82,11 @@ export function matching(
           };
           fills.push(fill);
           level.availableQty -= openRemaining;
+          depthChanges.push({
+            side: type === "long" ? "ask" : "bid",
+            price,
+            quantity: level.availableQty,
+          });
           //delete from openorders
           level.openOrders.splice(k, 1);
           k--;
@@ -89,6 +99,11 @@ export function matching(
           currorder.filledQty += currorder.remainingQty;
           openorder.filledQty += currorder.remainingQty;
           level.availableQty -= currorder.remainingQty;
+          depthChanges.push({
+            side: type === "long" ? "ask" : "bid",
+            price,
+            quantity: level.availableQty,
+          });
           currorder.remainingQty = currorder.qty - currorder.filledQty;
           //create a fill for this partially filled order
           const fill = {
@@ -111,9 +126,14 @@ export function matching(
       marketorderbook.lastTradedPrice = price;
       if (level.openOrders.length === 0) {
         delete maps[price];
+        depthChanges.push({
+          side: type === "long" ? "ask" : "bid",
+          price,
+          quantity: 0,
+        });
       }
       if (currorder.remainingQty === 0) {
-        return fills;
+        return { fills, depthChanges };
       }
     }
   } else {
@@ -139,8 +159,18 @@ export function matching(
               },
             ],
           };
+          depthChanges.push({
+            side: "bid",
+            price: currorder.price,
+            quantity: marketorderbook.bids[currorder.price]!.availableQty,
+          });
         } else {
           marketorderbook.bids[currorder.price]!.availableQty += currorder.qty;
+          depthChanges.push({
+            side: "bid",
+            price: currorder.price,
+            quantity: marketorderbook.bids[currorder.price]!.availableQty,
+          });
           marketorderbook.bids[currorder.price]?.openOrders.push({
             userId,
             orderId,
@@ -163,8 +193,18 @@ export function matching(
               },
             ],
           };
+          depthChanges.push({
+            side: "ask",
+            price: currorder.price,
+            quantity: marketorderbook.asks[currorder.price]!.availableQty,
+          });
         } else {
           marketorderbook.asks[currorder.price]!.availableQty += currorder.qty;
+          depthChanges.push({
+            side: "ask",
+            price: currorder.price,
+            quantity: marketorderbook.asks[currorder.price]!.availableQty,
+          });
           marketorderbook.asks[currorder.price]?.openOrders.push({
             userId,
             orderId,
@@ -173,7 +213,7 @@ export function matching(
             createdAt: new Date(),
           });
         }
-        return fills;
+        return { fills, depthChanges };
       }
     } else {
       for (let i = 0; i < numkeys.length; i++) {
@@ -215,6 +255,11 @@ export function matching(
             };
             fills.push(fill);
             level.availableQty -= openRemaining;
+            depthChanges.push({
+              side: type === "long" ? "ask" : "bid",
+              price,
+              quantity: level.availableQty,
+            });
             level.openOrders.splice(k, 1);
             k--;
             if (currorder.remainingQty === 0) {
@@ -225,6 +270,11 @@ export function matching(
             const matchedqty = currorder.remainingQty;
             openorder.filledQty += currorder.remainingQty;
             level.availableQty -= currorder.remainingQty;
+            depthChanges.push({
+              side: type === "long" ? "ask" : "bid",
+              price,
+              quantity: level.availableQty,
+            });
             currorder.filledQty += currorder.remainingQty;
             currorder.remainingQty = currorder.qty - currorder.filledQty;
             //create a fill for this partially filled order
@@ -247,6 +297,11 @@ export function matching(
         marketorderbook.lastTradedPrice = price;
         if (level.openOrders.length === 0) {
           delete maps[price];
+          depthChanges.push({
+            side: type === "long" ? "ask" : "bid",
+            price,
+            quantity: 0,
+          });
         }
         if (currorder.remainingQty === 0) {
           currorder.status = "Filled";
@@ -268,9 +323,19 @@ export function matching(
                 },
               ],
             };
+            depthChanges.push({
+              side: "bid",
+              price: currorder.price,
+              quantity: marketorderbook.bids[currorder.price]!.availableQty,
+            });
           } else {
             marketorderbook.bids[currorder.price]!.availableQty +=
               currorder.qty - currorder.filledQty;
+            depthChanges.push({
+              side: "bid",
+              price: currorder.price,
+              quantity: marketorderbook.bids[currorder.price]!.availableQty,
+            });
             marketorderbook.bids[currorder.price]?.openOrders.push({
               userId,
               orderId,
@@ -293,9 +358,19 @@ export function matching(
                 },
               ],
             };
+            depthChanges.push({
+              side: "ask",
+              price: currorder.price,
+              quantity: marketorderbook.asks[currorder.price]!.availableQty,
+            });
           } else {
             marketorderbook.asks[currorder.price]!.availableQty +=
               currorder.qty - currorder.filledQty;
+            depthChanges.push({
+              side: "ask",
+              price: currorder.price,
+              quantity: marketorderbook.asks[currorder.price]!.availableQty,
+            });
             marketorderbook.asks[currorder.price]?.openOrders.push({
               userId,
               orderId,
@@ -306,8 +381,8 @@ export function matching(
           }
         }
       }
-      return fills;
+      return { fills, depthChanges };
     }
   }
-  return fills;
+  return { fills, depthChanges };
 }

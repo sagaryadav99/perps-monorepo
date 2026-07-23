@@ -20,6 +20,9 @@ async function readMessages() {
     if (mssg.message.loopbackid) {
       await client.publish("backendTopic", JSON.stringify(mssg.message));
     }
+    if (mssg.message.type === "depthChange") {
+      await client.publish("depthChange", JSON.stringify(mssg.message));
+    }
     await client.xAck("from_engine", "pubsubGroup", mssg.id);
   }
 }

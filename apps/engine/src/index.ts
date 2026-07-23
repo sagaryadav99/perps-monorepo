@@ -42,39 +42,31 @@ async function listentoQueue() {
     } else if (message.messageType === "order") {
       const order = createOrder(message);
       if (order?.status !== "cancelled") {
-        if (order!.type === "market") {
-          const fills = matching(
-            order!.market,
-            message.userId,
-            order!.orderId,
-            order!.type,
-            order!.orderType,
-          );
-          if (fills && fills.length != 0) {
-            createPositions(fills, order!, false);
-          }
-          client2.xAdd("from_engine", "*", {
-            fills: JSON.stringify(fills),
-            order: JSON.stringify(order),
-            loopbackid: message.loopbackid,
-          });
-        } else {
-          const fills = matching(
-            order!.market,
-            message.userId,
-            order!.orderId,
-            order!.type,
-            order!.orderType,
-          );
-          if (fills && fills.length != 0) {
-            createPositions(fills, order!, false);
-          }
-          client2.xAdd("from_engine", "*", {
-            fills: JSON.stringify(fills),
-            order: JSON.stringify(order),
-            loopbackid: message.loopbackid,
-          });
+        const result = matching(
+          order!.market,
+          message.userId,
+          order!.orderId,
+          order!.type,
+          order!.orderType,
+        );
+        if (!result) {
+          lastProcessedId = response[0].messages[0].id;
+          continue;
         }
+        const { fills, depthChanges } = result;
+        if (fills && fills.length != 0) {
+          createPositions(fills, order!, false);
+        }
+        client2.xAdd("from_engine", "*", {
+          fills: JSON.stringify(fills),
+          order: JSON.stringify(order),
+          loopbackid: message.loopbackid,
+        });
+        client2.xAdd("from_engine", "*", {
+          type: "depthChange",
+          depthChanges: JSON.stringify(depthChanges),
+          market: order!.market,
+        });
       } else {
         client2.xAdd("from_engine", "*", {
           fills: JSON.stringify([]),

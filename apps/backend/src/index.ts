@@ -4,21 +4,29 @@ import jwt from "jsonwebtoken";
 import { authmiddleware } from "./middleware/authmiddleware";
 import { loopbackqueue } from "./loopbackfunction";
 import { transform } from "../utils/transformfunc";
+import cookieParser from "cookie-parser";
+import cors from "cors";
 const app = express();
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  }),
+);
 app.use(express.json());
+app.use(cookieParser());
 app.get("/users", (req, res) => {
   res.json("get back users");
 });
 app.post("/signup", async (req, res) => {
-  //signup user
   const { username, password } = req.body;
   if (!username || !password) {
     res.status(411).json({ message: "invalid credentials" });
     return;
   } else {
     try {
-      const user = await prisma.user.create({ data: { username, password } });
-      console.log(user);
+      //const user = await prisma.user.create({ data: { username, password } });
+      console.log(username, password);
       res.json({ message: "user created succesfully" });
     } catch (e) {
       console.log(e);
@@ -26,7 +34,6 @@ app.post("/signup", async (req, res) => {
   }
 });
 app.post("/signin", async (req, res) => {
-  //singin user
   const { username, password } = req.body;
   const user = await prisma.user.findFirst({ where: { username } });
   if (!user) {
@@ -34,10 +41,15 @@ app.post("/signin", async (req, res) => {
     return;
   }
   if (user.password !== password) {
-    res.json({ message: "password is incorrect try again" });
+    res.status(401).json({ message: "password is incorrect try again" });
     return;
   }
   const token = jwt.sign({ userid: user.id }, process.env.JWT_SECRET!);
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
+  });
   res.json({ message: `signed in successfully with userid ${user.id}`, token });
 });
 app.post("/onramp", authmiddleware, async (req, res) => {
@@ -88,15 +100,16 @@ app.post("/order", authmiddleware, async (req, res) => {
 app.delete("/order", (req, res) => {
   //delete a pending order
 });
-app.get("/equity/available", authmiddleware, async (req, res) => {
+app.get("/me", authmiddleware, async (req, res) => {
   //how much unlocked balance is available
   const userId = req.userid;
   if (!userId) {
     return;
   }
   try {
+    const user = await prisma.user.findUnique({ where: { id: userId } });
     const result = await loopbackqueue({ messageType: "getBalance", userId });
-    res.json({ balance: Number(result.balance) });
+    res.json({ username: user!.username, balance: Number(result.balance) });
   } catch (e) {
     console.log(e);
   }

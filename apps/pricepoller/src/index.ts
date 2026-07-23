@@ -10,7 +10,7 @@ ws.on("message", (rawData) => {
   const { data } = JSON.parse(rawData.toString());
   const obj = { messageType: "priceUpdate", market: data.s, price: data.c };
   const res = JSON.stringify(obj);
-  client.xAdd("incoming_stream", "*", {
-    res,
-  });
+  // client.xAdd("incoming_stream", "*", {
+  //   res,
+  // });
 });
