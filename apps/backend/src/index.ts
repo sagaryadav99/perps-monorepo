@@ -132,7 +132,7 @@ app.get("/getDepth/:marketId", authmiddleware, async (req, res) => {
     const parsedresult = JSON.parse(result.depth as string);
     const bids = transform(parsedresult.bids);
     const asks = transform(parsedresult.asks);
-    res.json({ result: { bids, asks } });
+    res.json({ bids, asks });
   } catch (e) {
     console.log(e);
   }

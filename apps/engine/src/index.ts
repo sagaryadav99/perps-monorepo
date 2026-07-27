@@ -80,7 +80,15 @@ async function listentoQueue() {
         market === "SOL"
           ? Number(message.price.slice(0, 5))
           : Number(message.price.slice(0, 7));
-      //liquidationCheck(market, price);
+      // const liquidationResults = liquidationCheck(market, price);
+
+      // for (const result of liquidationResults) {
+      //   client2.xAdd("from_engine", "*", {
+      //     type: "depthChange",
+      //     market,
+      //     depthChanges: JSON.stringify(result.depthChanges),
+      //   });
+      // }
       client2.xAdd("from_engine", "*", {
         type: "priceUpdate",
         market: market,

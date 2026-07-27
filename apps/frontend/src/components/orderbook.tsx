@@ -1,27 +1,5 @@
 import { useEffect, useState } from "react";
 import { useFetchBook } from "../hooks/useFetchBook";
-
-// const BIDS = [
-//   { p: 96418.5, sz: 1.842 },
-//   { p: 96417.0, sz: 0.91 },
-//   { p: 96415.5, sz: 2.104 },
-//   { p: 96414.0, sz: 0.556 },
-//   { p: 96412.5, sz: 3.221 },
-//   { p: 96411.0, sz: 1.098 },
-//   { p: 96409.5, sz: 0.74 },
-//   { p: 96408.0, sz: 2.615 },
-// ];
-
-// const ASKS = [
-//   { p: 96420.0, sz: 0.732 },
-//   { p: 96421.5, sz: 1.41 },
-//   { p: 96423.0, sz: 0.884 },
-//   { p: 96424.5, sz: 2.96 },
-//   { p: 96426.0, sz: 0.601 },
-//   { p: 96427.5, sz: 1.755 },
-//   { p: 96429.0, sz: 0.398 },
-//   { p: 96430.5, sz: 3.102 },
-// ];
 function PanelHeader({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex items-center justify-between border-b border-[#232A38] px-4 py-3">
@@ -52,11 +30,19 @@ export function OrderbookPanel({ symbol }: { symbol: string }) {
   const { data, isLoading, isError } = useFetchBook({ symbol });
   const [bids, setBids] = useState<{ p: number; sz: number }[]>([]);
   const [asks, setAsks] = useState<{ p: number; sz: number }[]>([]);
+  const bestAsk = asks.length ? asks[0].p : undefined;
+  const bestBid = bids.length ? bids[bids.length - 1].p : undefined;
+
+  const spread =
+    bestAsk !== undefined && bestBid !== undefined
+      ? bestAsk - bestBid
+      : undefined;
   useEffect(() => {
     if (!data) {
       return;
     }
-    const { arrasks, arrbids } = convertToArr(data.result);
+    console.log(data);
+    const { arrasks, arrbids } = convertToArr(data);
     setBids(arrbids);
     setAsks(arrasks);
   }, [data]);
@@ -80,7 +66,7 @@ export function OrderbookPanel({ symbol }: { symbol: string }) {
               className="relative grid grid-cols-3 px-2 py-[3px] font-mono text-[12px]"
             >
               <div
-                className="absolute inset-y-0 right-0 bg-[#F0555A]/10"
+                className="absolute inset-y-0 right-0 bg-[#F0555A]/10 transition-[width] duration-300 ease-in-out"
                 style={{ width: `${(a.sz / maxSize) * 100}%` }}
               />
               <span className="relative text-[#F0555A]">
@@ -89,30 +75,30 @@ export function OrderbookPanel({ symbol }: { symbol: string }) {
               <span className="relative text-right text-[#C7CCD6]">
                 {a.sz.toFixed(3)}
               </span>
-              {/* <span className="relative text-right text-[#7C8598]">
+              <span className="relative text-right text-[#7C8598]">
                 {(a.p * a.sz).toFixed(0)}
-              </span> */}
+              </span>
             </div>
           ))}
         </div>
 
         <div className="my-1 flex items-center justify-center gap-2 border-y border-[#232A38] py-2">
           <span className="font-mono text-[14px] font-semibold text-[#E7E9EE]">
-            96,420.25
+            {bestAsk ?? "--"}
           </span>
           <span className="font-mono text-[11px] text-[#7C8598]">
-            spread 1.50
+            spread {spread?.toFixed(2) ?? "--"}
           </span>
         </div>
 
         <div className="space-y-[2px]">
-          {bids.map((b) => (
+          {[...bids].reverse().map((b) => (
             <div
               key={b.p}
               className="relative grid grid-cols-3 px-2 py-[3px] font-mono text-[12px]"
             >
               <div
-                className="absolute inset-y-0 right-0 bg-[#34D399]/10"
+                className="absolute inset-y-0 right-0 bg-[#34D399]/10 transition-[width] duration-300 ease-in-out"
                 style={{ width: `${(b.sz / maxSize) * 100}%` }}
               />
               <span className="relative text-[#34D399]">
@@ -121,9 +107,9 @@ export function OrderbookPanel({ symbol }: { symbol: string }) {
               <span className="relative text-right text-[#C7CCD6]">
                 {b.sz.toFixed(3)}
               </span>
-              {/* <span className="relative text-right text-[#7C8598]">
+              <span className="relative text-right text-[#7C8598]">
                 {(b.p * b.sz).toFixed(0)}
-              </span> */}
+              </span>
             </div>
           ))}
         </div>

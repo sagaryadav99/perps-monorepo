@@ -23,6 +23,12 @@ async function readMessages() {
     if (mssg.message.type === "depthChange") {
       await client.publish("depthChange", JSON.stringify(mssg.message));
     }
+    if (mssg.message.type === "positionUpdate") {
+      await client.publish("positionUpdate", JSON.stringify(mssg.message));
+    }
+    if (mssg.message.type === "priceUpdate") {
+      await client.publish("priceUpdate", JSON.stringify(mssg.message));
+    }
     await client.xAck("from_engine", "pubsubGroup", mssg.id);
   }
 }

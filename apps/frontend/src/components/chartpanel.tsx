@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { MarketSelector } from "./marketselector";
+import { PriceTicker } from "./priceticker";
 
 export function ChartPanel({ symbol }: { symbol: string }) {
   const [interval, setInterval] = useState(2);
@@ -9,10 +10,10 @@ export function ChartPanel({ symbol }: { symbol: string }) {
       <div className="flex items-center justify-between border-b border-[#232A38] px-4 py-3">
         <div className="flex items-center gap-3">
           <span className="font-semibold text-[#E7E9EE]">{symbol}</span>
-          <span className="font-mono text-[13px] text-[#34D399]">
-            96,420.50
+          <span className="font-mono flex">
+            <PriceTicker symbol={symbol} />
           </span>
-          <span className="font-mono text-[12px] text-[#34D399]">+2.14%</span>
+          {/* <span className="font-mono text-[12px] text-[#34D399]">+2.14%</span> */}
         </div>
         <div className="flex items-center gap-1">
           {["5m", "15m", "1h", "4h", "1D"].map((tf, i) => (

@@ -17,7 +17,21 @@ export function OrderFormPanel({ symbol }: { symbol: string }) {
   const [size, setSize] = useState("");
   const [leverage, setLeverage] = useState(1);
   const orderMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async ({
+      price,
+      size,
+      orderType,
+      symbol,
+      side,
+      leverage,
+    }: {
+      price: string;
+      size: string;
+      orderType: "market" | "limit";
+      symbol: string;
+      side: string;
+      leverage: number;
+    }) => {
       const { data } = await axios.post(
         "http://localhost:3000/order",
         {
@@ -40,7 +54,7 @@ export function OrderFormPanel({ symbol }: { symbol: string }) {
   });
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    orderMutation.mutate();
+    orderMutation.mutate({ price, size, orderType, symbol, side, leverage });
     // TODO: POST to your matching engine order endpoint
     // await api.post('/orders', { side, orderType, price, size, leverage })
   };
