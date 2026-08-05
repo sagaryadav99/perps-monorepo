@@ -137,19 +137,40 @@ app.get("/getDepth/:marketId", authmiddleware, async (req, res) => {
     console.log(e);
   }
 });
-app.get("/positions/open/:marketId", (req, res) => {
+app.get("/positions/open/:marketId", authmiddleware, async (req, res) => {
   //returns open positions for that marketId
+  const userid = req.userid;
+  const { marketId } = req.params;
+  if (!userid) {
+    return;
+  }
+  if (!marketId || Array.isArray(marketId)) {
+    return;
+  }
+  try {
+    const result = await loopbackqueue({
+      messageType: "getOpenPositions",
+      userId: userid,
+      marketId,
+    });
+    console.log(result);
+    let response = JSON.parse(result.positions as string);
+    console.log(response);
+    res.json({ positions: response });
+  } catch (e) {
+    console.log(e);
+  }
 });
-app.get("/positions/closed/:marketId", (req, res) => {
+app.get("/positions/closed/:marketId", authmiddleware, (req, res) => {
   //returns closed positions for that marketId
 });
-app.get("/orders/open/:marketId", (req, res) => {
+app.get("/orders/open/:marketId", authmiddleware, (req, res) => {
   //returns open orders for tha marketid
 });
-app.get("/orders/:marketId", (req, res) => {
+app.get("/orders/:marketId", authmiddleware, (req, res) => {
   //returns all the orders for that market id
 });
-app.get("/fills", (req, res) => {
+app.get("/fills", authmiddleware, (req, res) => {
   //returns all the fullfilled orders
 });
 

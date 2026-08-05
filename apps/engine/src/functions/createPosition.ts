@@ -30,6 +30,12 @@ function updatePosition(
   orderId: string,
   liquidated: boolean,
 ) {
+  console.log("Fill:", fill);
+  console.log("updatePosition", {
+    userId,
+    side,
+    orderId,
+  });
   const user = users.find((x: any) => x.userId == userId);
   const order = user!.orders.find((x: any) => x.orderId == orderId);
   const position = positions.find((x) => {
@@ -37,9 +43,9 @@ function updatePosition(
       x.userId === userId && x.market === fill.market && x.status === "open"
     );
   });
-
   if (!position) {
-    positions.push({
+    const newPosition = {
+      positionId: crypto.randomUUID(),
       userId,
       market: fill.market,
       qty: fill.qty,
@@ -48,9 +54,10 @@ function updatePosition(
       averagePrice: fill.price,
       pnl: 0,
       liquidationPrice: liquidatPriceCalc(fill.price, side, order!.leverage),
-      status: "open",
+      status: "open" as const,
       leverage: order!.leverage,
-    });
+    };
+    positions.push(newPosition);
   } else if (position.type === side) {
     const totalqty = position.qty + fill.qty;
     const totalprice =
@@ -115,6 +122,7 @@ function updatePosition(
       user!.collateral.locked -= position.margin;
       user!.collateral.available += position.margin + realizedpnl;
       positions.push({
+        positionId: crypto.randomUUID(),
         userId,
         market: position.market,
         type: side,

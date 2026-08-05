@@ -61,7 +61,7 @@ export type ToEngine =
       orderId: string;
     }
   | {
-      messageType: "getDepth";
+      messageType: "getDepth" | "getOpenPositions" | "getClosedPositions";
       userId: string;
       marketId: string;
     };
@@ -80,6 +80,7 @@ export type Order = {
   createdAt: Date;
 };
 export type Position = {
+  positionId: string;
   userId: string;
   market: string;
   type: string;

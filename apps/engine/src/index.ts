@@ -4,7 +4,12 @@ import { createOrder } from "./functions/createOrder";
 import { matching } from "./functions/matching";
 import { createPositions } from "./functions/createPosition";
 import { liquidationCheck } from "./functions/liquidationCheck";
-import { orderbooks, readsnapshot, savesnapshot } from "./functions/seed";
+import {
+  orderbooks,
+  positions,
+  readsnapshot,
+  savesnapshot,
+} from "./functions/seed";
 const client = createClient();
 client.connect();
 const client2 = createClient();
@@ -56,6 +61,7 @@ async function listentoQueue() {
         const { fills, depthChanges } = result;
         if (fills && fills.length != 0) {
           createPositions(fills, order!, false);
+          console.log("Engine positions:", positions);
         }
         client2.xAdd("from_engine", "*", {
           fills: JSON.stringify(fills),
@@ -107,6 +113,18 @@ async function listentoQueue() {
 
       client2.xAdd("from_engine", "*", {
         depth: JSON.stringify(depth),
+        loopbackid: message.loopbackid,
+      });
+    } else if (message.messageType === "getOpenPositions") {
+      const marketId = message.marketId;
+      const userId = message.userId;
+      const openPositions = positions.filter((x) => {
+        return (
+          x.userId === userId && x.status === "open" && x.market === marketId
+        );
+      });
+      client2.xAdd("from_engine", "*", {
+        positions: JSON.stringify(openPositions),
         loopbackid: message.loopbackid,
       });
     }

@@ -60,7 +60,7 @@ export function Dashboard() {
         <OrderbookPanel symbol={symbol} />
         <OrderFormPanel symbol={symbol} />
       </div>
-      <PositionsPanel />
+      <PositionsPanel symbol={symbol} />
     </div>
   );
 }

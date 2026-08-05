@@ -34,10 +34,21 @@ export function matching(
           .sort((a, b) => b - a);
   let maps = type === "long" ? marketorderbook.asks : marketorderbook.bids;
   if (orderType === "market") {
-    const totalAvailableQty = numkeys.reduce((sum, price) => {
-      return sum + (maps[price]?.availableQty ?? 0);
-    }, 0);
-    if (currorder.qty > totalAvailableQty) {
+    let totalAvailableQty = 0;
+
+    for (const price of numkeys) {
+      const level = maps[price];
+      if (!level) continue;
+
+      for (const order of level.openOrders) {
+        if (order.userId === userId) {
+          continue; // Ignore my own orders
+        }
+
+        totalAvailableQty += order.qty - order.filledQty;
+      }
+    }
+    if (currorder.remainingQty > totalAvailableQty) {
       cancelOrder(user.userId, orderId, currorder.remainingQty);
       return { fills: [], depthChanges: [] };
     }
@@ -60,6 +71,9 @@ export function matching(
         }
         const openorder = level.openOrders[k];
         if (!openorder) {
+          continue;
+        }
+        if (openorder.userId === userId) {
           continue;
         }
         let openRemaining = openorder.qty - openorder.filledQty;
@@ -233,6 +247,9 @@ export function matching(
         for (let k = 0; k < level.openOrders.length; k++) {
           let openorder = level.openOrders[k];
           if (!openorder) {
+            continue;
+          }
+          if (openorder.userId === userId) {
             continue;
           }
           let openRemaining = openorder.qty - openorder.filledQty;

@@ -1,5 +1,7 @@
 // components/positions-panel.tsx
-import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { useEffect, useState } from "react";
 
 type Tab = "positions" | "open" | "history" | "trades";
 
@@ -154,8 +156,26 @@ function EmptyRow({ colSpan, label }: { colSpan: number; label: string }) {
   );
 }
 
-function PositionsTable() {
-  if (POSITIONS.length === 0)
+function PositionsTable({ symbol }: { symbol: string }) {
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["positions", symbol],
+    queryFn: async () => {
+      const data = await axios(
+        `http://localhost:3000/positions/open/${symbol}`,
+        { withCredentials: true },
+      );
+      console.log(typeof data.data.positions);
+      return data.data.positions;
+    },
+  });
+  const [positions, setPositions] = useState([]);
+  useEffect(() => {
+    if (!data) {
+      return;
+    }
+    setPositions(data);
+  }, [data]);
+  if (positions.length === 0)
     return <EmptyTable colSpan={8} label="No open positions" />;
   return (
     <table className="w-full">
@@ -165,37 +185,37 @@ function PositionsTable() {
           <Th>Side</Th>
           <Th right>Size</Th>
           <Th right>Entry price</Th>
-          <Th right>Mark price</Th>
+          {/* <Th right>Mark price</Th> */}
           <Th right>Liq. price</Th>
           <Th right>PNL</Th>
           <Th right>Close</Th>
         </tr>
       </thead>
       <tbody className="divide-y divide-[#1A1F2B]">
-        {POSITIONS.map((p) => (
-          <tr key={p.symbol} className="hover:bg-[#151A24]">
-            <Td className="text-[#E7E9EE]">{p.symbol}</Td>
+        {positions.map((p: any) => (
+          <tr key={p.market} className="hover:bg-[#151A24]">
+            <Td className="text-[#E7E9EE]">{p.market}</Td>
             <Td>
-              <SideTag side={p.side} />
+              <SideTag side={p.type} />
             </Td>
             <Td right className="text-[#C7CCD6]">
-              {p.size}
+              {p.qty}
             </Td>
             <Td right className="text-[#C7CCD6]">
-              {p.entry.toLocaleString()}
+              {p.averagePrice.toLocaleString()}
             </Td>
-            <Td right className="text-[#C7CCD6]">
+            {/* <Td right className="text-[#C7CCD6]">
               {p.mark.toLocaleString()}
-            </Td>
+            </Td> */}
             <Td right className="text-[#F0555A]">
-              {p.liq.toLocaleString()}
+              {p.liquidationPrice.toLocaleString()}
             </Td>
             <Td
               right
               className={p.pnl >= 0 ? "text-[#34D399]" : "text-[#F0555A]"}
             >
               {p.pnl >= 0 ? "+" : ""}
-              {p.pnl.toFixed(2)} ({p.pnlPct >= 0 ? "+" : ""}
+              {p.pnl.toFixed(2)} ( {p.pnlPct >= 0 ? "+" : ""}
               {p.pnlPct}%)
             </Td>
             <Td right>
@@ -358,7 +378,7 @@ function EmptyTable({ colSpan, label }: { colSpan: number; label: string }) {
   );
 }
 
-export function PositionsPanel() {
+export function PositionsPanel({ symbol }: { symbol: string }) {
   const [tab, setTab] = useState<Tab>("positions");
 
   return (
@@ -388,7 +408,7 @@ export function PositionsPanel() {
       </div>
 
       <div className="overflow-x-auto">
-        {tab === "positions" && <PositionsTable />}
+        {tab === "positions" && <PositionsTable symbol={symbol} />}
         {tab === "open" && <OpenOrdersTable />}
         {tab === "history" && <OrderHistoryTable />}
         {tab === "trades" && <TradeHistoryTable />}
