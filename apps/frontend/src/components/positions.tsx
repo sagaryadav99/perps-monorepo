@@ -5,28 +5,28 @@ import { useEffect, useState } from "react";
 
 type Tab = "positions" | "open" | "history" | "trades";
 
-const POSITIONS = [
-  {
-    symbol: "BTC-PERP",
-    side: "long",
-    size: 0.842,
-    entry: 94120.5,
-    mark: 96420.25,
-    pnl: 1936.42,
-    pnlPct: 24.4,
-    liq: 84210.0,
-  },
-  {
-    symbol: "ETH-PERP",
-    side: "short",
-    size: 4.2,
-    entry: 3580.0,
-    mark: 3512.8,
-    pnl: 282.24,
-    pnlPct: 6.8,
-    liq: 3921.5,
-  },
-];
+// const POSITIONS = [
+//   {
+//     symbol: "BTC-PERP",
+//     side: "long",
+//     size: 0.842,
+//     entry: 94120.5,
+//     mark: 96420.25,
+//     pnl: 1936.42,
+//     pnlPct: 24.4,
+//     liq: 84210.0,
+//   },
+//   {
+//     symbol: "ETH-PERP",
+//     side: "short",
+//     size: 4.2,
+//     entry: 3580.0,
+//     mark: 3512.8,
+//     pnl: 282.24,
+//     pnlPct: 6.8,
+//     liq: 3921.5,
+//   },
+// ];
 
 const OPEN_ORDERS = [
   {
@@ -156,25 +156,7 @@ function EmptyRow({ colSpan, label }: { colSpan: number; label: string }) {
   );
 }
 
-function PositionsTable({ symbol }: { symbol: string }) {
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["positions", symbol],
-    queryFn: async () => {
-      const data = await axios(
-        `http://localhost:3000/positions/open/${symbol}`,
-        { withCredentials: true },
-      );
-      console.log(typeof data.data.positions);
-      return data.data.positions;
-    },
-  });
-  const [positions, setPositions] = useState([]);
-  useEffect(() => {
-    if (!data) {
-      return;
-    }
-    setPositions(data);
-  }, [data]);
+function PositionsTable({ positions }: { positions: any[] }) {
   if (positions.length === 0)
     return <EmptyTable colSpan={8} label="No open positions" />;
   return (
@@ -381,6 +363,18 @@ function EmptyTable({ colSpan, label }: { colSpan: number; label: string }) {
 export function PositionsPanel({ symbol }: { symbol: string }) {
   const [tab, setTab] = useState<Tab>("positions");
 
+  const { data } = useQuery({
+    queryKey: ["positions", symbol],
+    queryFn: async () => {
+      const res = await axios(
+        `http://localhost:3000/positions/open/${symbol}`,
+        { withCredentials: true },
+      );
+      return res.data.positions;
+    },
+  });
+  const positions = data ?? [];
+
   return (
     <div className="flex flex-col rounded-[12px] border border-[#232A38] bg-[#12161F]">
       <div className="flex items-center gap-5 border-b border-[#232A38] px-4">
@@ -395,8 +389,8 @@ export function PositionsPanel({ symbol }: { symbol: string }) {
             }`}
           >
             {t.label}
-            {t.key === "positions" && POSITIONS.length > 0 && (
-              <span className="ml-1.5 text-[#F5A623]">{POSITIONS.length}</span>
+            {t.key === "positions" && positions.length > 0 && (
+              <span className="ml-1.5 text-[#F5A623]">{positions.length}</span>
             )}
             {t.key === "open" && OPEN_ORDERS.length > 0 && (
               <span className="ml-1.5 text-[#F5A623]">
@@ -408,7 +402,7 @@ export function PositionsPanel({ symbol }: { symbol: string }) {
       </div>
 
       <div className="overflow-x-auto">
-        {tab === "positions" && <PositionsTable symbol={symbol} />}
+        {tab === "positions" && <PositionsTable positions={positions} />}
         {tab === "open" && <OpenOrdersTable />}
         {tab === "history" && <OrderHistoryTable />}
         {tab === "trades" && <TradeHistoryTable />}

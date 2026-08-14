@@ -42,9 +42,13 @@ export function Dashboard() {
             return { asks, bids };
           },
         );
-      } else {
+      } else if (data.type === "priceUpdate") {
         queryclient.setQueryData(["price", symbol], () => {
           return data.data;
+        });
+      } else if (data.type === "positionUpdate") {
+        queryclient.setQueryData(["positions", symbol], () => {
+          return data.positionUpdate;
         });
       }
     };

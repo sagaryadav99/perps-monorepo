@@ -3,6 +3,7 @@ import { addBalance, getBalance } from "./functions/addBalance";
 import { createOrder } from "./functions/createOrder";
 import { matching } from "./functions/matching";
 import { createPositions } from "./functions/createPosition";
+import type { Position } from "@perps-monorepo/shared";
 import { liquidationCheck } from "./functions/liquidationCheck";
 import {
   orderbooks,
@@ -59,9 +60,18 @@ async function listentoQueue() {
           continue;
         }
         const { fills, depthChanges } = result;
+        let updateMap: Record<string, Position[]> = {};
         if (fills && fills.length != 0) {
-          createPositions(fills, order!, false);
-          console.log("Engine positions:", positions);
+          let updates = createPositions(fills, order!, false);
+          // console.log("Engine positions:", positions);
+          for (const item of updates) {
+            let positionsForUserId = positions.filter((x) => x.userId == item);
+            updateMap[item] = positionsForUserId;
+          }
+          client2.xAdd("from_engine", "*", {
+            type: "positionUpdate",
+            updates: JSON.stringify(updateMap),
+          });
         }
         client2.xAdd("from_engine", "*", {
           fills: JSON.stringify(fills),

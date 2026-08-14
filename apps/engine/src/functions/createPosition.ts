@@ -4,7 +4,8 @@ export function createPositions(
   fills: Fill[],
   order: Order,
   liquidated: boolean,
-) {
+): Set<string> {
+  let positionUpdates = new Set<string>();
   for (const fill of fills) {
     updatePosition(
       fill.takerUserId,
@@ -13,6 +14,8 @@ export function createPositions(
       fill.takerOrderId,
       liquidated,
     );
+    positionUpdates.add(fill.takerUserId);
+    positionUpdates.add(fill.makerUserId);
     const makerSide = fill.takerSide === "long" ? "short" : "long";
     updatePosition(
       fill.makerUserId,
@@ -22,6 +25,7 @@ export function createPositions(
       liquidated,
     );
   }
+  return positionUpdates;
 }
 function updatePosition(
   userId: string,

@@ -46,13 +46,26 @@ wss.on("connection", (ws, req) => {
   });
 });
 async function listenDepthChange() {
-  await client.subscribe(["depthChange", "priceUpdate"], (rawMessage) => {
-    const message = JSON.parse(rawMessage);
-    if (message.type === "depthChange") {
-      socketmgr.pushDepth(message.depthChanges, message.market);
-    } else {
-      socketmgr.pushPriceUpdate(message.price, message.market);
-    }
-  });
+  await client.subscribe(
+    ["depthChange", "priceUpdate", "positionUpdate"],
+    (rawMessage) => {
+      const message = JSON.parse(rawMessage);
+      switch (message.type) {
+        case "depthChange":
+          socketmgr.pushDepth(message.depthChanges, message.market);
+          break;
+        case "priceUpdate":
+          socketmgr.pushPriceUpdate(message.price, message.market);
+          break;
+        case "positionUpdate":
+          socketmgr.pushPositionUpdate(message.updates);
+      }
+      // if (message.type === "depthChange") {
+      //   socketmgr.pushDepth(message.depthChanges, message.market);
+      // } else {
+      //   socketmgr.pushPriceUpdate(message.price, message.market);
+      // }
+    },
+  );
 }
 listenDepthChange();

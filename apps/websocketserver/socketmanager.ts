@@ -66,4 +66,19 @@ export class SocketManager {
       );
     }
   }
+  pushPositionUpdate(positionmap: any) {
+    let parsed = JSON.parse(positionmap);
+    for (const item in parsed) {
+      let ws = this.userMap.get(item);
+      if (!ws) {
+        return;
+      }
+      ws.send(
+        JSON.stringify({
+          positionUpdate: parsed[item],
+          type: "positionUpdate",
+        }),
+      );
+    }
+  }
 }
