@@ -6,8 +6,11 @@ import axios from "axios";
 export function Header() {
   const queryClient = useQueryClient();
   const { data, isLoading } = useMe();
+
   const [showAddFunds, setShowAddFunds] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const [amount, setAmount] = useState("");
+
   const balanceUpdate = useMutation({
     mutationFn: async (amount: string) => {
       const { data } = await axios.post(
@@ -19,8 +22,10 @@ export function Header() {
           withCredentials: true,
         },
       );
+
       return data;
     },
+
     onSuccess: (data) => {
       queryClient.setQueryData(["me"], (old: any) => ({
         ...old,
@@ -28,20 +33,45 @@ export function Header() {
       }));
     },
   });
+
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      const { data } = await axios.post(
+        "http://localhost:3000/logout",
+        {},
+        {
+          withCredentials: true,
+        },
+      );
+
+      return data;
+    },
+
+    onSuccess: () => {
+      // Remove the logged-in user's data
+      queryClient.removeQueries({ queryKey: ["me"] });
+
+      // redirect to signin page
+      window.location.href = "/signin";
+    },
+  });
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
 
   const username = data?.username ?? "";
   const balance = data?.balance ?? 0;
+
   const submitDeposit = (e: React.FormEvent) => {
     e.preventDefault();
+
     balanceUpdate.mutate(amount);
-    // TODO: POST to your deposit/wallet endpoint
-    // await api.post('/wallet/deposit', { amount })
+
     setShowAddFunds(false);
     setAmount("");
   };
+
   return (
     <>
       <header className="flex items-center justify-between border-b border-[#232A38] bg-[#0A0E14] px-4 py-3">
@@ -50,11 +80,13 @@ export function Header() {
         </span>
 
         <div className="flex items-center gap-3">
+          {/* Wallet */}
           <div className="flex items-center gap-3 rounded-[8px] border border-[#232A38] bg-[#12161F] px-3.5 py-1.5">
             <div className="text-right">
               <div className="font-mono text-[10px] uppercase tracking-[0.1em] text-[#7C8598]">
                 Wallet balance
               </div>
+
               <div className="font-mono text-[13px] font-semibold text-[#E7E9EE]">
                 $
                 {balance.toLocaleString(undefined, {
@@ -62,6 +94,7 @@ export function Header() {
                 })}
               </div>
             </div>
+
             <button
               onClick={() => setShowAddFunds(true)}
               className="rounded-[6px] bg-[#F5A623] px-3 py-1.5 font-mono text-[12px] font-semibold text-[#0A0E14] transition-opacity hover:opacity-90"
@@ -70,17 +103,45 @@ export function Header() {
             </button>
           </div>
 
-          <div className="flex items-center gap-2 rounded-[8px] border border-[#232A38] bg-[#12161F] px-3 py-1.5">
-            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#1E2530] font-mono text-[11px] text-[#C7CCD6]">
-              {username[0].toUpperCase()}
-            </div>
-            <span className="font-mono text-[13px] text-[#E7E9EE]">
-              {username}
-            </span>
+          {/* User menu */}
+          <div className="relative">
+            <button
+              onClick={() => setShowUserMenu((prev) => !prev)}
+              className="flex items-center gap-2 rounded-[8px] border border-[#232A38] bg-[#12161F] px-3 py-1.5 hover:border-[#3A4256]"
+            >
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#1E2530] font-mono text-[11px] text-[#C7CCD6]">
+                {username[0]?.toUpperCase()}
+              </div>
+
+              <span className="font-mono text-[13px] text-[#E7E9EE]">
+                {username}
+              </span>
+
+              <span className="text-[10px] text-[#7C8598]">
+                {showUserMenu ? "▲" : "▼"}
+              </span>
+            </button>
+
+            {/* Dropdown */}
+            {showUserMenu && (
+              <div className="absolute right-0 top-full z-50 mt-2 w-[160px] rounded-[8px] border border-[#232A38] bg-[#12161F] p-1 shadow-xl">
+                <button
+                  onClick={() => {
+                    setShowUserMenu(false);
+                    logoutMutation.mutate();
+                  }}
+                  disabled={logoutMutation.isPending}
+                  className="w-full rounded-[6px] px-3 py-2 text-left font-mono text-[13px] text-[#E7E9EE] transition-colors hover:bg-[#1E2530] hover:text-red-400 disabled:opacity-50"
+                >
+                  {logoutMutation.isPending ? "Logging out..." : "Logout"}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </header>
 
+      {/* Add funds modal */}
       {showAddFunds && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-5"
@@ -93,6 +154,7 @@ export function Header() {
             <h2 className="mb-1 text-[18px] font-semibold text-[#E7E9EE]">
               Add funds
             </h2>
+
             <p className="mb-5 text-[13px] text-[#7C8598]">
               Deposit into your wallet to open new positions.
             </p>
@@ -102,6 +164,7 @@ export function Header() {
                 <span className="mb-1.5 block font-mono text-[11px] uppercase tracking-[0.12em] text-[#7C8598]">
                   Amount (USD)
                 </span>
+
                 <input
                   type="number"
                   value={amount}
@@ -133,11 +196,13 @@ export function Header() {
                 >
                   Cancel
                 </button>
+
                 <button
                   type="submit"
-                  className="flex-1 rounded-[7px] bg-[#F5A623] py-2.5 font-mono text-[13px] font-semibold text-[#0A0E14] transition-opacity hover:opacity-90"
+                  disabled={balanceUpdate.isPending}
+                  className="flex-1 rounded-[7px] bg-[#F5A623] py-2.5 font-mono text-[13px] font-semibold text-[#0A0E14] transition-opacity hover:opacity-90 disabled:opacity-50"
                 >
-                  Deposit
+                  {balanceUpdate.isPending ? "Depositing..." : "Deposit"}
                 </button>
               </div>
             </form>

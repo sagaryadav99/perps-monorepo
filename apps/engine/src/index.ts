@@ -74,6 +74,7 @@ async function listentoQueue() {
           });
         }
         client2.xAdd("from_engine", "*", {
+          type: "dbUpdate",
           fills: JSON.stringify(fills),
           order: JSON.stringify(order),
           loopbackid: message.loopbackid,
@@ -85,6 +86,7 @@ async function listentoQueue() {
         });
       } else {
         client2.xAdd("from_engine", "*", {
+          type: "dbUpdate",
           fills: JSON.stringify([]),
           order: JSON.stringify(order),
           loopbackid: message.loopbackid,
@@ -96,6 +98,7 @@ async function listentoQueue() {
         market === "SOL"
           ? Number(message.price.slice(0, 5))
           : Number(message.price.slice(0, 7));
+      const timeStamp = message.timeStamp;
       // const liquidationResults = liquidationCheck(market, price);
 
       // for (const result of liquidationResults) {
@@ -109,6 +112,7 @@ async function listentoQueue() {
         type: "priceUpdate",
         market: market,
         price: price.toString(),
+        timeStamp: timeStamp.toString(),
       });
     } else if (message.messageType === "getBalance") {
       const userId = message.userId;

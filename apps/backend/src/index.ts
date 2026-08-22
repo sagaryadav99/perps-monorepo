@@ -52,6 +52,18 @@ app.post("/signin", async (req, res) => {
   });
   res.json({ message: `signed in successfully with userid ${user.id}`, token });
 });
+app.post("/logout", (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
+    path: "/",
+  });
+
+  return res.json({
+    message: "logged out successfully",
+  });
+});
 app.post("/onramp", authmiddleware, async (req, res) => {
   const userId = req.userid;
   if (!userId) {

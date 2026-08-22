@@ -61,6 +61,15 @@ model Fill{
   taker_user    User         @relation("taker_user",fields: [takerUserId],references: [id])
   maker_user    User         @relation("maker_user",fields:[makerUserId],references: [id])
 }
+
+model PriceUpdates{
+  id    String       @id @default(uuid())
+  timestamp DateTime @db.Timestamptz(6)
+  symbol   String
+  price    Decimal   @db.Decimal(30,10)
+
+  @@index([symbol,timestamp])
+}
 enum orderStatus{
   Cancelled
   Filled
