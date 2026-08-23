@@ -32,11 +32,11 @@ model Order{
   market_id     String
   orderType     orderType
   type          Side 
-  price         Int 
-  qty           Int
-  initialMargin Int
-  filledQty     Int
-  remainingQty  Int
+  price         Decimal  @db.Decimal(30, 10)
+  qty           Decimal  @db.Decimal(30, 10)
+  initialMargin Decimal  @db.Decimal(30, 10)
+  filledQty     Decimal  @db.Decimal(30, 10)
+  remainingQty  Decimal  @db.Decimal(30, 10)
   leverage      Int
   status        orderStatus
   createdAt     DateTime     @default(now())
@@ -48,8 +48,8 @@ model Order{
 model Fill{
   id            String       @id @default(uuid())
   marketId      String
-  price         Int
-  qty           Int
+  price         Decimal  @db.Decimal(30, 10)
+  qty           Decimal  @db.Decimal(30, 10)
   takerUserId   String
   makerUserId   String
   takerOrderId  String
@@ -62,13 +62,14 @@ model Fill{
   maker_user    User         @relation("maker_user",fields:[makerUserId],references: [id])
 }
 
-model PriceUpdates{
-  id    String       @id @default(uuid())
+model PriceUpdates {
+  id        String   @default(uuid())
   timestamp DateTime @db.Timestamptz(6)
-  symbol   String
-  price    Decimal   @db.Decimal(30,10)
+  symbol    String
+  price     Decimal  @db.Decimal(30, 10)
 
-  @@index([symbol,timestamp])
+  @@id([id, timestamp])
+  @@index([symbol, timestamp])
 }
 enum orderStatus{
   Cancelled

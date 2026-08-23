@@ -28,11 +28,6 @@ async function readMessages() {
     const mssg = message[0].messages;
     for (const item of mssg) {
       ack.push(item.id);
-      // if (item.message.messageType === "priceUpdate") {
-      //   prices.push(item.message);
-      // } else  {
-      //   dbupdate.push(item.message);
-      // }
       switch (item.message.type) {
         case "priceUpdate":
           prices.push(item.message);

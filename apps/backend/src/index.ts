@@ -25,7 +25,7 @@ app.post("/signup", async (req, res) => {
     return;
   } else {
     try {
-      //const user = await prisma.user.create({ data: { username, password } });
+      const user = await prisma.user.create({ data: { username, password } });
       console.log(username, password);
       res.json({ message: "user created succesfully" });
     } catch (e) {
