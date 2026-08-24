@@ -173,6 +173,56 @@ app.get("/positions/open/:marketId", authmiddleware, async (req, res) => {
     console.log(e);
   }
 });
+app.get("/candles/:symbol", authmiddleware, async (req, res) => {
+  try {
+    const { symbol } = req.params;
+    const interval = req.query.interval;
+
+    if (
+      interval !== "1m" &&
+      interval !== "5m" &&
+      interval !== "10m" &&
+      interval !== "30m"
+    ) {
+      return res.status(400).json({
+        error: "Invalid interval",
+      });
+    }
+
+    const views = {
+      "1m": "Candles1m",
+      "5m": "Candles5m",
+      "10m": "Candles10m",
+      "30m": "Candles30m",
+    } as const;
+
+    const view = views[interval];
+
+    const candles = await prisma.$queryRawUnsafe(
+      `
+        SELECT
+          bucket,
+          symbol,
+          open,
+          high,
+          low,
+          close
+        FROM "${view}"
+        WHERE symbol = $1
+        ORDER BY bucket ASC
+      `,
+      symbol,
+    );
+    console.log(candles);
+    return res.json(candles);
+  } catch (error) {
+    console.error("Failed to fetch candles:", error);
+
+    return res.status(500).json({
+      error: "Failed to fetch candles",
+    });
+  }
+});
 app.get("/positions/closed/:marketId", authmiddleware, (req, res) => {
   //returns closed positions for that marketId
 });
