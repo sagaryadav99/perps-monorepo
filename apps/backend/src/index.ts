@@ -46,7 +46,7 @@ app.post("/signin", async (req, res) => {
   }
   const token = jwt.sign({ userid: user.id }, process.env.JWT_SECRET!);
   res.cookie("token", token, {
-    httpOnly: true,
+    httpOnly: process.env.NODE_ENV === "production",
     secure: false,
     sameSite: "lax",
   });

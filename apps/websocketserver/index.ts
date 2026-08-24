@@ -9,11 +9,21 @@ client.connect();
 const wss = new WebSocketServer({ port: 8080 });
 const socketmgr = new SocketManager();
 wss.on("connection", (ws, req) => {
-  let cookie = req.headers.cookie;
+  const cookie = req.headers.cookie;
+
   if (!cookie) {
     return ws.close();
   }
-  let token = cookie.split("=").slice(-1)[0];
+
+  const token = cookie
+    .split(";")
+    .map((c) => c.trim())
+    .find((c) => c.startsWith("token="))
+    ?.slice("token=".length);
+
+  if (!token) {
+    return ws.close();
+  }
   let userid: string;
   try {
     let decoded = jwt.verify(token!, process.env.JWT_SECRET!) as {
