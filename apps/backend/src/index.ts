@@ -6,6 +6,7 @@ import { loopbackqueue } from "./loopbackfunction";
 import { transform } from "../utils/transformfunc";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+const PORT = Number(process.env.PORT) || 3000;
 const app = express();
 app.use(
   cors({
@@ -296,6 +297,6 @@ app.get("/trades", authmiddleware, async (req, res) => {
   }
 });
 
-app.listen(3000, () => {
-  console.log("listening on port 3000");
+app.listen(PORT, () => {
+  console.log(`listening on port ${PORT}`);
 });
