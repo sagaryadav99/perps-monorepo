@@ -4,11 +4,7 @@ import { Signup } from "./components/signup";
 import { Signin } from "./components/signin";
 import { Dashboard } from "./components/dashboard";
 import { Home } from "./components/home";
-import {
-  QueryClient,
-  QueryClientProvider,
-  useQuery,
-} from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { DashboardLayout } from "./components/dashboardLayout";
 import { ProtectedRoute } from "./components/protectedRoute";
 const queryclient = new QueryClient();

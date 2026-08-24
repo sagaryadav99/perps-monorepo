@@ -37,7 +37,6 @@ async function listentoQueue() {
       continue;
     }
     const message = JSON.parse(response[0].messages[0].message.res);
-    //console.log(message);
     if (message.messageType === "onRamp") {
       const user = addBalance(message);
       client2.xAdd("from_engine", "*", {
@@ -56,7 +55,6 @@ async function listentoQueue() {
           order!.orderType,
         );
         const depth = orderbooks["SOL"];
-        console.log(depth);
         if (!result) {
           lastProcessedId = response[0].messages[0].id;
           continue;
@@ -65,7 +63,6 @@ async function listentoQueue() {
         let updateMap: Record<string, Position[]> = {};
         if (fills && fills.length != 0) {
           let updates = createPositions(fills, order!, false);
-          // console.log("Engine positions:", positions);
           for (const item of updates) {
             let positionsForUserId = positions.filter((x) => x.userId == item);
             updateMap[item] = positionsForUserId;

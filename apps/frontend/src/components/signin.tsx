@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios, { AxiosError } from "axios";
+import { API_URL } from "../config";
 export function Signin() {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
@@ -9,7 +10,7 @@ export function Signin() {
   const mutation = useMutation({
     mutationFn: async () => {
       const { data } = await axios.post(
-        "http://localhost:3000/signin",
+        `${API_URL}/signin`,
         {
           username,
           password,

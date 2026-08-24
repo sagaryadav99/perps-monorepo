@@ -2,11 +2,12 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useMutation } from "@tanstack/react-query";
+import { API_URL } from "../config";
 export function Signup() {
   const navigate = useNavigate();
   const mutation = useMutation({
     mutationFn: async () => {
-      const data = await axios.post("http://localhost:3000/signup", {
+      const data = await axios.post(`${API_URL}/signup`, {
         username,
         password,
       });

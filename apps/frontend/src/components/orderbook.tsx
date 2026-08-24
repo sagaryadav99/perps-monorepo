@@ -27,7 +27,7 @@ function convertToArr(data: {
   return { arrasks, arrbids };
 }
 export function OrderbookPanel({ symbol }: { symbol: string }) {
-  const { data, isLoading, isError } = useFetchBook({ symbol });
+  const { data } = useFetchBook({ symbol });
   const [bids, setBids] = useState<{ p: number; sz: number }[]>([]);
   const [asks, setAsks] = useState<{ p: number; sz: number }[]>([]);
   const bestAsk = asks.length ? asks[0].p : undefined;

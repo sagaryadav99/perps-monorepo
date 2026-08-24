@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useMe } from "../hooks/useme";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-
+import { API_URL } from "../config";
 export function Header() {
   const queryClient = useQueryClient();
   const { data, isLoading } = useMe();
@@ -14,7 +14,7 @@ export function Header() {
   const balanceUpdate = useMutation({
     mutationFn: async (amount: string) => {
       const { data } = await axios.post(
-        "http://localhost:3000/onramp",
+        `${API_URL}/onramp`,
         {
           amount: Number(amount),
         },
@@ -37,7 +37,7 @@ export function Header() {
   const logoutMutation = useMutation({
     mutationFn: async () => {
       const { data } = await axios.post(
-        "http://localhost:3000/logout",
+        `${API_URL}/onramp`,
         {},
         {
           withCredentials: true,

@@ -39,7 +39,6 @@ export class SocketManager {
     }
   }
   async pushDepth(data: any, market: string) {
-    console.log(data);
     const websockets = this.socketMap.get(market);
     if (!websockets) {
       return;
@@ -49,7 +48,6 @@ export class SocketManager {
     }
   }
   async pushPriceUpdate(data: any, market: string) {
-    console.log(data);
     const websockets = this.socketMap.get(market);
     if (!websockets) {
       return;

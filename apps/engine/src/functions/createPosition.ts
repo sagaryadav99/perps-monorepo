@@ -34,12 +34,6 @@ function updatePosition(
   orderId: string,
   liquidated: boolean,
 ) {
-  console.log("Fill:", fill);
-  console.log("updatePosition", {
-    userId,
-    side,
-    orderId,
-  });
   const user = users.find((x: any) => x.userId == userId);
   const order = user!.orders.find((x: any) => x.orderId == orderId);
   const position = positions.find((x) => {

@@ -1,16 +1,16 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import { ChartPanel } from "./chartpanel";
 import { OrderbookPanel } from "./orderbook";
 import { OrderFormPanel } from "./orderform";
 import { PositionsPanel } from "./positions";
 import { useParams } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-
+import { WS_URL } from "../config";
 export function Dashboard() {
   const queryclient = useQueryClient();
   const { symbol = "SOL" } = useParams();
   useEffect(() => {
-    const wss = new WebSocket("ws://localhost:8080");
+    const wss = new WebSocket(WS_URL);
     wss.onopen = () => {
       wss.send(JSON.stringify({ type: "subscribe", market: symbol }));
     };

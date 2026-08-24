@@ -32,7 +32,6 @@ wss.on("connection", (ws, req) => {
   ws.on("error", console.error);
   ws.on("message", (rawMessage) => {
     const message = JSON.parse(rawMessage.toString());
-    console.log("message received", message);
     if (message.type === "subscribe") {
       socketmgr.subscribe(ws, message.market);
     }

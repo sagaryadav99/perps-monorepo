@@ -1,9 +1,10 @@
 import type { ToEngine } from "@perps-monorepo/shared";
 import { createRedisGroup } from "@perps-monorepo/shared";
 import { createClient } from "redis";
-const client = createClient();
+const redisUrl = process.env.REDIS_URL || "redis://localhost:6379";
+const client = createClient({ url: redisUrl });
 client.connect();
-const client2 = createClient();
+const client2 = createClient({ url: redisUrl });
 client2.connect();
 const promiseMap = new Map<string, any>();
 export function loopbackqueue(

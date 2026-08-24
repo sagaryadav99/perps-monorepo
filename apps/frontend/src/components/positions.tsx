@@ -2,7 +2,7 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
-
+import { API_URL } from "../config";
 type Tab = "positions" | "open" | "history" | "trades";
 
 const TABS: { key: Tab; label: string }[] = [
@@ -132,7 +132,7 @@ function OpenOrdersTable({ symbol }: { symbol: string }) {
   const { data, isLoading, error } = useQuery({
     queryKey: ["openOrders", symbol],
     queryFn: async () => {
-      const res = await axios(`http://localhost:3000/orders/open/${symbol}`, {
+      const res = await axios(`${API_URL}/orders/open/${symbol}`, {
         withCredentials: true,
       });
 
@@ -264,7 +264,7 @@ function OrderHistoryTable({ symbol }: { symbol: string }) {
   const { data, isLoading, error } = useQuery({
     queryKey: ["orderHistory", symbol],
     queryFn: async () => {
-      const res = await axios(`http://localhost:3000/orders/${symbol}`, {
+      const res = await axios(`${API_URL}/orders/${symbol}`, {
         withCredentials: true,
       });
 
@@ -383,7 +383,7 @@ function TradeHistoryTable() {
   const { data, isLoading, error } = useQuery({
     queryKey: ["tradeHistory"],
     queryFn: async () => {
-      const res = await axios("http://localhost:3000/trades", {
+      const res = await axios(`${API_URL}/trades`, {
         withCredentials: true,
       });
       return res.data.trades;
@@ -505,10 +505,9 @@ export function PositionsPanel({ symbol }: { symbol: string }) {
   const { data } = useQuery({
     queryKey: ["positions", symbol],
     queryFn: async () => {
-      const res = await axios(
-        `http://localhost:3000/positions/open/${symbol}`,
-        { withCredentials: true },
-      );
+      const res = await axios(`${API_URL}/positions/open/${symbol}`, {
+        withCredentials: true,
+      });
       return res.data.positions;
     },
   });

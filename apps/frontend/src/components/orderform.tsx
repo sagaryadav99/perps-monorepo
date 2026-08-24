@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
+import { API_URL } from "../config";
 function PanelHeader({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex items-center justify-between border-b border-[#232A38] px-4 py-3">
@@ -33,7 +34,7 @@ export function OrderFormPanel({ symbol }: { symbol: string }) {
       leverage: number;
     }) => {
       const { data } = await axios.post(
-        "http://localhost:3000/order",
+        `${API_URL}/order`,
         {
           price: Number(price),
           qty: Number(size),

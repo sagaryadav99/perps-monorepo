@@ -95,8 +95,6 @@ export function matching(
             if (makerOrder.remainingQty === 0) {
               makerOrder.status = "Filled";
             }
-
-            console.log("UPDATED MAKER ORDER:", makerOrder);
           }
           updatedOrders.push(makerOrder);
           //create a fill for every order that matches one fill for every match
@@ -305,8 +303,6 @@ export function matching(
               if (makerOrder.remainingQty === 0) {
                 makerOrder.status = "Filled";
               }
-
-              console.log("UPDATED MAKER ORDER:", makerOrder);
             }
             updatedOrders.push(makerOrder);
             //create a fill for this openorder

@@ -44,44 +44,27 @@ async function start() {
       }
 
       const mssg = message[0].messages;
-
-      // --------------------------------
-      // Separate messages by type
-      // --------------------------------
-
       for (const item of mssg) {
         switch (item.message.type) {
           case "priceUpdate":
             priceack.push(item.id);
             prices.push(item.message);
             break;
-
           case "dbUpdate":
-            console.log("dbupdate", item.message);
-
             dbupdate.push({
               id: item.id,
               message: item.message,
             });
             break;
-
           default:
             ack.push(item.id);
             break;
         }
       }
 
-      // --------------------------------
-      // ACK unknown messages
-      // --------------------------------
-
       for (const item of ack) {
         await client.xAck("from_engine", "dbpollerConsumerGroup", item);
       }
-
-      // --------------------------------
-      // Price updates
-      // --------------------------------
 
       if (prices.length > 0) {
         await prisma.priceUpdates.createMany({
@@ -98,10 +81,6 @@ async function start() {
         }
       }
 
-      // --------------------------------
-      // DB updates
-      // --------------------------------
-
       for (const item of dbupdate) {
         try {
           const order = JSON.parse(item.message.order);
@@ -109,24 +88,16 @@ async function start() {
           const updatedOrders = JSON.parse(item.message.updatedOrders);
 
           await prisma.$transaction(async (tx) => {
-            // ==========================================
-            // 1. Update the order that triggered the DB update
-            // ==========================================
-
             await tx.order.upsert({
               where: {
                 id: order.orderId,
               },
-
               create: {
                 id: order.orderId,
                 userId: item.message.userId,
                 market_id: order.market,
-
                 orderType: order.type === "market" ? "Market" : "Limit",
-
                 type: order.orderType === "long" ? "Long" : "Short",
-
                 price: order.price,
                 qty: order.qty,
                 initialMargin: order.margin,
@@ -136,18 +107,12 @@ async function start() {
                 status: order.status,
                 createdAt: new Date(order.createdAt),
               },
-
               update: {
                 filledQty: order.filledQty,
                 remainingQty: order.remainingQty,
                 status: order.status,
               },
             });
-
-            // ==========================================
-            // 2. Update the other orders affected by fills
-            // ==========================================
-
             for (const updatedOrder of updatedOrders) {
               await tx.order.update({
                 where: {
@@ -161,11 +126,6 @@ async function start() {
                 },
               });
             }
-
-            // ==========================================
-            // 3. Insert fills
-            // ==========================================
-
             if (fills.length > 0) {
               await tx.fill.createMany({
                 data: fills.map((fill: any) => ({
@@ -173,15 +133,11 @@ async function start() {
                   marketId: fill.market,
                   price: fill.price,
                   qty: fill.qty,
-
                   takerUserId: fill.takerUserId,
                   makerUserId: fill.makerUserId,
-
                   takerOrderId: fill.takerOrderId,
                   makerOrderId: fill.makerOrderId,
-
                   takerSide: fill.takerSide === "long" ? "Long" : "Short",
-
                   createdAt: new Date(fill.createdAt),
                 })),
 
@@ -189,20 +145,11 @@ async function start() {
               });
             }
           });
-
-          // ==========================================
-          // ACK ONLY AFTER DB TRANSACTION SUCCEEDS
-          // ==========================================
-
           await client.xAck("from_engine", "dbpollerConsumerGroup", item.id);
 
           console.log("DB update completed:", order.orderId);
         } catch (error) {
           console.error(`Failed to process DB update ${item.id}:`, error);
-
-          // Do NOT ACK here.
-          // Redis will keep the message pending so it
-          // can be retried.
         }
       }
     }
