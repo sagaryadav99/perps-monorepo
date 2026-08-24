@@ -5,6 +5,5 @@ export function transform(side: Record<string, Bid>) {
   for (const key in side) {
     newobj[key] = side[key]!.availableQty;
   }
-  console.log(newobj);
   return newobj;
 }

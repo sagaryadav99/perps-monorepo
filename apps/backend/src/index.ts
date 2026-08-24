@@ -26,7 +26,6 @@ app.post("/signup", async (req, res) => {
   } else {
     try {
       const user = await prisma.user.create({ data: { username, password } });
-      console.log(username, password);
       res.json({ message: "user created succesfully" });
     } catch (e) {
       console.log(e);
@@ -86,7 +85,6 @@ app.post("/order", authmiddleware, async (req, res) => {
     return;
   }
   const { price, qty, type, market, side, leverage } = req.body;
-  //push to the outgoing queue
   const orderId = crypto.randomUUID();
   try {
     const response = await loopbackqueue({
@@ -150,7 +148,6 @@ app.get("/getDepth/:marketId", authmiddleware, async (req, res) => {
   }
 });
 app.get("/positions/open/:marketId", authmiddleware, async (req, res) => {
-  //returns open positions for that marketId
   const userid = req.userid;
   const { marketId } = req.params;
   if (!userid) {
@@ -165,9 +162,7 @@ app.get("/positions/open/:marketId", authmiddleware, async (req, res) => {
       userId: userid,
       marketId,
     });
-    console.log(result);
     let response = JSON.parse(result.positions as string);
-    console.log(response);
     res.json({ positions: response });
   } catch (e) {
     console.log(e);
@@ -213,7 +208,6 @@ app.get("/candles/:symbol", authmiddleware, async (req, res) => {
       `,
       symbol,
     );
-    console.log(candles);
     return res.json(candles);
   } catch (error) {
     console.error("Failed to fetch candles:", error);
@@ -223,17 +217,83 @@ app.get("/candles/:symbol", authmiddleware, async (req, res) => {
     });
   }
 });
-app.get("/positions/closed/:marketId", authmiddleware, (req, res) => {
-  //returns closed positions for that marketId
+app.get("/orders/open/:marketId", authmiddleware, async (req, res) => {
+  const { marketId } = req.params;
+  const userId = req.userid;
+  if (!userId) {
+    return;
+  }
+  const data = await prisma.order.findMany({
+    where: {
+      userId,
+      market_id: marketId as string,
+      status: "Open",
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return res.json({ orders: data });
 });
-app.get("/orders/open/:marketId", authmiddleware, (req, res) => {
-  //returns open orders for tha marketid
+app.get("/orders/:marketId", authmiddleware, async (req, res) => {
+  const userId = req.userid;
+  const { marketId } = req.params;
+  const data = await prisma.order.findMany({
+    where: {
+      userId,
+      market_id: marketId as string,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+  res.json({ allorders: data });
 });
-app.get("/orders/:marketId", authmiddleware, (req, res) => {
-  //returns all the orders for that market id
-});
-app.get("/fills", authmiddleware, (req, res) => {
-  //returns all the fullfilled orders
+app.get("/trades", authmiddleware, async (req, res) => {
+  try {
+    const userId = req.userid;
+
+    const fills = await prisma.fill.findMany({
+      where: {
+        OR: [
+          {
+            takerUserId: userId,
+          },
+          {
+            makerUserId: userId,
+          },
+        ],
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    const trades = fills.map((fill) => ({
+      id: fill.id,
+      market: fill.marketId,
+      price: fill.price,
+      qty: fill.qty,
+
+      side:
+        fill.takerUserId === userId
+          ? fill.takerSide
+          : fill.takerSide === "Long"
+            ? "Short"
+            : "Long",
+
+      createdAt: fill.createdAt,
+    }));
+
+    return res.json({ trades });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Failed to fetch trade history",
+    });
+  }
 });
 
 app.listen(3000, () => {

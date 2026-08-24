@@ -6,7 +6,6 @@ client.connect();
 const client2 = createClient();
 client2.connect();
 const promiseMap = new Map<string, any>();
-const workerGroupid = `beWorker${crypto.randomUUID().slice(0, 8)}`;
 export function loopbackqueue(
   message: ToEngine,
 ): Promise<Record<string, string>> {
@@ -23,7 +22,6 @@ export function loopbackqueue(
     }, 10000);
   });
 }
-//createRedisGroup(client2, "from_engine", "beConsumerGroup");
 async function listenforReplies() {
   await client2.subscribe("backendTopic", (rawMessage) => {
     const message = JSON.parse(rawMessage);

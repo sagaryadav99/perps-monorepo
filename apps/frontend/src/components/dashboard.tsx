@@ -16,7 +16,6 @@ export function Dashboard() {
     };
     wss.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      console.log(data);
       if (data.type === "depthChange") {
         queryclient.setQueryData(
           ["book", symbol],

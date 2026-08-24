@@ -1,6 +1,6 @@
 import { users, orderbooks } from "./seed";
 import { cancelOrder } from "./cancelOrder";
-import type { Fill } from "@perps-monorepo/shared";
+import type { Fill, Order } from "@perps-monorepo/shared";
 export function matching(
   market: string,
   userId: string,
@@ -9,6 +9,7 @@ export function matching(
   type: string,
 ) {
   const fills: Fill[] = [];
+  const updatedOrders: Order[] = [];
   const depthChanges: {
     side: "bid" | "ask";
     price: number;
@@ -54,7 +55,7 @@ export function matching(
     }
     if (numkeys.length === 0 || !numkeys) {
       cancelOrder(userId, orderId, currorder.remainingQty);
-      return { fills, depthChanges };
+      return { fills, depthChanges, updatedOrders };
     }
     for (let i = 0; i < numkeys.length; i++) {
       const price = numkeys[i];
@@ -81,6 +82,23 @@ export function matching(
           currorder.filledQty += openRemaining;
           currorder.remainingQty = currorder.qty - currorder.filledQty;
           openorder.filledQty += openRemaining;
+          const makerUser = users.find((x) => x.userId === openorder.userId);
+
+          const makerOrder = makerUser?.orders.find(
+            (x) => x.orderId === openorder.orderId,
+          );
+
+          if (makerOrder) {
+            makerOrder.filledQty = openorder.filledQty;
+            makerOrder.remainingQty = makerOrder.qty - makerOrder.filledQty;
+
+            if (makerOrder.remainingQty === 0) {
+              makerOrder.status = "Filled";
+            }
+
+            console.log("UPDATED MAKER ORDER:", makerOrder);
+          }
+          updatedOrders.push(makerOrder);
           //create a fill for every order that matches one fill for every match
           const fill = {
             fillId: crypto.randomUUID(),
@@ -113,6 +131,23 @@ export function matching(
           currorder.filledQty += currorder.remainingQty;
           openorder.filledQty += currorder.remainingQty;
           level.availableQty -= currorder.remainingQty;
+          const makerUser = users.find((x) => x.userId === openorder.userId);
+
+          const makerOrder = makerUser?.orders.find(
+            (x) => x.orderId === openorder.orderId,
+          );
+
+          if (makerOrder) {
+            makerOrder.filledQty = openorder.filledQty;
+            makerOrder.remainingQty = makerOrder.qty - makerOrder.filledQty;
+
+            if (makerOrder.remainingQty === 0) {
+              makerOrder.status = "Filled";
+            }
+
+            updatedOrders.push(makerOrder);
+          }
+
           depthChanges.push({
             side: type === "long" ? "ask" : "bid",
             price,
@@ -147,7 +182,7 @@ export function matching(
         });
       }
       if (currorder.remainingQty === 0) {
-        return { fills, depthChanges };
+        return { fills, depthChanges, updatedOrders };
       }
     }
   } else {
@@ -227,7 +262,7 @@ export function matching(
             createdAt: new Date(),
           });
         }
-        return { fills, depthChanges };
+        return { fills, depthChanges, updatedOrders };
       }
     } else {
       for (let i = 0; i < numkeys.length; i++) {
@@ -257,6 +292,23 @@ export function matching(
             currorder.filledQty += openRemaining;
             currorder.remainingQty = currorder.qty - currorder.filledQty;
             openorder.filledQty = openorder.qty;
+            const makerUser = users.find((x) => x.userId === openorder.userId);
+
+            const makerOrder = makerUser?.orders.find(
+              (x) => x.orderId === openorder.orderId,
+            );
+
+            if (makerOrder) {
+              makerOrder.filledQty = openorder.filledQty;
+              makerOrder.remainingQty = makerOrder.qty - makerOrder.filledQty;
+
+              if (makerOrder.remainingQty === 0) {
+                makerOrder.status = "Filled";
+              }
+
+              console.log("UPDATED MAKER ORDER:", makerOrder);
+            }
+            updatedOrders.push(makerOrder);
             //create a fill for this openorder
             const fill = {
               fillId: crypto.randomUUID(),
@@ -287,6 +339,22 @@ export function matching(
             const matchedqty = currorder.remainingQty;
             openorder.filledQty += currorder.remainingQty;
             level.availableQty -= currorder.remainingQty;
+            const makerUser = users.find((x) => x.userId === openorder.userId);
+
+            const makerOrder = makerUser?.orders.find(
+              (x) => x.orderId === openorder.orderId,
+            );
+
+            if (makerOrder) {
+              makerOrder.filledQty = openorder.filledQty;
+              makerOrder.remainingQty = makerOrder.qty - makerOrder.filledQty;
+
+              if (makerOrder.remainingQty === 0) {
+                makerOrder.status = "Filled";
+              }
+
+              updatedOrders.push(makerOrder);
+            }
             depthChanges.push({
               side: type === "long" ? "ask" : "bid",
               price,
@@ -294,6 +362,10 @@ export function matching(
             });
             currorder.filledQty += currorder.remainingQty;
             currorder.remainingQty = currorder.qty - currorder.filledQty;
+
+            if (currorder.remainingQty === 0) {
+              currorder.status = "Filled";
+            }
             //create a fill for this partially filled order
             const fill = {
               fillId: crypto.randomUUID(),
@@ -398,8 +470,8 @@ export function matching(
           }
         }
       }
-      return { fills, depthChanges };
+      return { fills, depthChanges, updatedOrders };
     }
   }
-  return { fills, depthChanges };
+  return { fills, depthChanges, updatedOrders };
 }

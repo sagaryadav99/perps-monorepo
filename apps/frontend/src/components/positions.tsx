@@ -1,93 +1,9 @@
 // components/positions-panel.tsx
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 type Tab = "positions" | "open" | "history" | "trades";
-
-// const POSITIONS = [
-//   {
-//     symbol: "BTC-PERP",
-//     side: "long",
-//     size: 0.842,
-//     entry: 94120.5,
-//     mark: 96420.25,
-//     pnl: 1936.42,
-//     pnlPct: 24.4,
-//     liq: 84210.0,
-//   },
-//   {
-//     symbol: "ETH-PERP",
-//     side: "short",
-//     size: 4.2,
-//     entry: 3580.0,
-//     mark: 3512.8,
-//     pnl: 282.24,
-//     pnlPct: 6.8,
-//     liq: 3921.5,
-//   },
-// ];
-
-const OPEN_ORDERS = [
-  {
-    symbol: "SOL-PERP",
-    side: "long",
-    type: "Limit",
-    price: 172.0,
-    size: 12.0,
-    filled: 0,
-    time: "14:02:11",
-  },
-  {
-    symbol: "ARB-PERP",
-    side: "short",
-    type: "Limit",
-    price: 0.845,
-    size: 500,
-    filled: 120,
-    time: "13:47:55",
-  },
-];
-
-const ORDER_HISTORY = [
-  {
-    symbol: "BTC-PERP",
-    side: "long",
-    type: "Market",
-    price: 94120.5,
-    size: 0.842,
-    status: "Filled",
-    time: "07/19 09:12",
-  },
-  {
-    symbol: "AVAX-PERP",
-    side: "short",
-    type: "Limit",
-    price: 42.5,
-    size: 20,
-    status: "Cancelled",
-    time: "07/18 16:30",
-  },
-];
-
-const TRADE_HISTORY = [
-  {
-    symbol: "BTC-PERP",
-    side: "long",
-    price: 94120.5,
-    size: 0.842,
-    fee: 3.96,
-    time: "07/19 09:12",
-  },
-  {
-    symbol: "OP-PERP",
-    side: "short",
-    price: 2.21,
-    size: 800,
-    fee: 0.71,
-    time: "07/17 11:04",
-  },
-];
 
 const TABS: { key: Tab; label: string }[] = [
   { key: "positions", label: "Positions" },
@@ -212,9 +128,84 @@ function PositionsTable({ positions }: { positions: any[] }) {
   );
 }
 
-function OpenOrdersTable() {
-  if (OPEN_ORDERS.length === 0)
+function OpenOrdersTable({ symbol }: { symbol: string }) {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["openOrders", symbol],
+    queryFn: async () => {
+      const res = await axios(`http://localhost:3000/orders/open/${symbol}`, {
+        withCredentials: true,
+      });
+
+      return res.data.orders;
+    },
+  });
+
+  const orders = data ?? [];
+
+  if (isLoading) {
+    return (
+      <table className="w-full">
+        <thead className="border-b border-[#232A38]">
+          <tr>
+            <Th>Market</Th>
+            <Th>Side</Th>
+            <Th>Type</Th>
+            <Th right>Price</Th>
+            <Th right>Size</Th>
+            <Th right>Filled</Th>
+            <Th right>Time</Th>
+            <Th right>Cancel</Th>
+          </tr>
+        </thead>
+
+        <tbody className="divide-y divide-[#1A1F2B]">
+          {[1, 2, 3].map((i) => (
+            <tr key={i}>
+              <Td>
+                <div className="h-3 w-10 animate-pulse rounded bg-[#232A38]" />
+              </Td>
+
+              <Td>
+                <div className="h-3 w-12 animate-pulse rounded bg-[#232A38]" />
+              </Td>
+
+              <Td>
+                <div className="h-3 w-12 animate-pulse rounded bg-[#232A38]" />
+              </Td>
+
+              <Td right>
+                <div className="ml-auto h-3 w-16 animate-pulse rounded bg-[#232A38]" />
+              </Td>
+
+              <Td right>
+                <div className="ml-auto h-3 w-10 animate-pulse rounded bg-[#232A38]" />
+              </Td>
+
+              <Td right>
+                <div className="ml-auto h-3 w-10 animate-pulse rounded bg-[#232A38]" />
+              </Td>
+
+              <Td right>
+                <div className="ml-auto h-3 w-20 animate-pulse rounded bg-[#232A38]" />
+              </Td>
+
+              <Td right>
+                <div className="ml-auto h-6 w-14 animate-pulse rounded-[5px] bg-[#232A38]" />
+              </Td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  }
+
+  if (error) {
+    return <div>Failed to load orders</div>;
+  }
+
+  if (orders.length === 0)
     return <EmptyTable colSpan={8} label="No open orders" />;
+
   return (
     <table className="w-full">
       <thead className="border-b border-[#232A38]">
@@ -229,26 +220,34 @@ function OpenOrdersTable() {
           <Th right>Cancel</Th>
         </tr>
       </thead>
+
       <tbody className="divide-y divide-[#1A1F2B]">
-        {OPEN_ORDERS.map((o, i) => (
-          <tr key={i} className="hover:bg-[#151A24]">
-            <Td className="text-[#E7E9EE]">{o.symbol}</Td>
+        {orders.map((o: any) => (
+          <tr key={o.id} className="hover:bg-[#151A24]">
+            <Td className="text-[#E7E9EE]">{o.market_id}</Td>
+
             <Td>
-              <SideTag side={o.side} />
+              <SideTag side={o.type.toLowerCase()} />
             </Td>
-            <Td className="text-[#C7CCD6]">{o.type}</Td>
+
+            <Td className="text-[#C7CCD6]">{o.orderType}</Td>
+
             <Td right className="text-[#C7CCD6]">
-              {o.price.toLocaleString()}
+              {Number(o.price).toLocaleString()}
             </Td>
+
             <Td right className="text-[#C7CCD6]">
-              {o.size}
+              {Number(o.qty)}
             </Td>
+
             <Td right className="text-[#7C8598]">
-              {o.filled}
+              {Number(o.filledQty)}
             </Td>
+
             <Td right className="text-[#7C8598]">
-              {o.time}
+              {new Date(o.createdAt).toLocaleTimeString()}
             </Td>
+
             <Td right>
               <button className="rounded-[5px] border border-[#232A38] px-2.5 py-1 text-[11px] text-[#C7CCD6] transition-colors hover:border-[#F0555A] hover:text-[#F0555A]">
                 Cancel
@@ -261,9 +260,80 @@ function OpenOrdersTable() {
   );
 }
 
-function OrderHistoryTable() {
-  if (ORDER_HISTORY.length === 0)
-    return <EmptyTable colSpan={6} label="No past orders" />;
+function OrderHistoryTable({ symbol }: { symbol: string }) {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["orderHistory", symbol],
+    queryFn: async () => {
+      const res = await axios(`http://localhost:3000/orders/${symbol}`, {
+        withCredentials: true,
+      });
+
+      return res.data.allorders;
+    },
+  });
+
+  const orders = data ?? [];
+
+  if (isLoading) {
+    return (
+      <table className="w-full">
+        <thead className="border-b border-[#232A38]">
+          <tr>
+            <Th>Market</Th>
+            <Th>Side</Th>
+            <Th>Type</Th>
+            <Th right>Price</Th>
+            <Th right>Size</Th>
+            <Th right>Status</Th>
+            <Th right>Time</Th>
+          </tr>
+        </thead>
+
+        <tbody className="divide-y divide-[#1A1F2B]">
+          {[1, 2, 3].map((i) => (
+            <tr key={i}>
+              <Td>
+                <div className="h-3 w-10 animate-pulse rounded bg-[#232A38]" />
+              </Td>
+
+              <Td>
+                <div className="h-3 w-12 animate-pulse rounded bg-[#232A38]" />
+              </Td>
+
+              <Td>
+                <div className="h-3 w-12 animate-pulse rounded bg-[#232A38]" />
+              </Td>
+
+              <Td right>
+                <div className="ml-auto h-3 w-16 animate-pulse rounded bg-[#232A38]" />
+              </Td>
+
+              <Td right>
+                <div className="ml-auto h-3 w-10 animate-pulse rounded bg-[#232A38]" />
+              </Td>
+
+              <Td right>
+                <div className="ml-auto h-3 w-16 animate-pulse rounded bg-[#232A38]" />
+              </Td>
+
+              <Td right>
+                <div className="ml-auto h-3 w-20 animate-pulse rounded bg-[#232A38]" />
+              </Td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  }
+
+  if (error) {
+    return <div>Failed to load order history</div>;
+  }
+
+  if (orders.length === 0) {
+    return <EmptyTable colSpan={7} label="No past orders" />;
+  }
+
   return (
     <table className="w-full">
       <thead className="border-b border-[#232A38]">
@@ -277,30 +347,30 @@ function OrderHistoryTable() {
           <Th right>Time</Th>
         </tr>
       </thead>
+
       <tbody className="divide-y divide-[#1A1F2B]">
-        {ORDER_HISTORY.map((o, i) => (
-          <tr key={i} className="hover:bg-[#151A24]">
-            <Td className="text-[#E7E9EE]">{o.symbol}</Td>
+        {orders.map((o: any) => (
+          <tr key={o.id} className="hover:bg-[#151A24]">
+            <Td className="text-[#E7E9EE]">{o.market_id}</Td>
+
             <Td>
-              <SideTag side={o.side} />
+              <SideTag side={o.type.toLowerCase()} />
             </Td>
-            <Td className="text-[#C7CCD6]">{o.type}</Td>
+
+            <Td className="text-[#C7CCD6]">{o.orderType}</Td>
+
             <Td right className="text-[#C7CCD6]">
-              {o.price.toLocaleString()}
+              {Number(o.price).toLocaleString()}
             </Td>
+
             <Td right className="text-[#C7CCD6]">
-              {o.size}
+              {Number(o.qty)}
             </Td>
-            <Td
-              right
-              className={
-                o.status === "Filled" ? "text-[#34D399]" : "text-[#7C8598]"
-              }
-            >
-              {o.status}
-            </Td>
+
+            <Td right>{o.status}</Td>
+
             <Td right className="text-[#7C8598]">
-              {o.time}
+              {new Date(o.createdAt).toLocaleString()}
             </Td>
           </tr>
         ))}
@@ -310,8 +380,71 @@ function OrderHistoryTable() {
 }
 
 function TradeHistoryTable() {
-  if (TRADE_HISTORY.length === 0)
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["tradeHistory"],
+    queryFn: async () => {
+      const res = await axios("http://localhost:3000/trades", {
+        withCredentials: true,
+      });
+      return res.data.trades;
+    },
+  });
+  const trades = data ?? [];
+
+  if (isLoading) {
+    return (
+      <table className="w-full">
+        <thead className="border-b border-[#232A38]">
+          <tr>
+            <Th>Market</Th>
+            <Th>Side</Th>
+            <Th right>Price</Th>
+            <Th right>Size</Th>
+            <Th right>Fee</Th>
+            <Th right>Time</Th>
+          </tr>
+        </thead>
+
+        <tbody className="divide-y divide-[#1A1F2B]">
+          {[1, 2, 3].map((i) => (
+            <tr key={i}>
+              <Td>
+                <div className="h-3 w-10 animate-pulse rounded bg-[#232A38]" />
+              </Td>
+
+              <Td>
+                <div className="h-3 w-12 animate-pulse rounded bg-[#232A38]" />
+              </Td>
+
+              <Td right>
+                <div className="ml-auto h-3 w-16 animate-pulse rounded bg-[#232A38]" />
+              </Td>
+
+              <Td right>
+                <div className="ml-auto h-3 w-10 animate-pulse rounded bg-[#232A38]" />
+              </Td>
+
+              <Td right>
+                <div className="ml-auto h-3 w-12 animate-pulse rounded bg-[#232A38]" />
+              </Td>
+
+              <Td right>
+                <div className="ml-auto h-3 w-20 animate-pulse rounded bg-[#232A38]" />
+              </Td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  }
+  if (error) {
+    return <div>Failed to load trade history</div>;
+  }
+
+  if (trades.length === 0) {
     return <EmptyTable colSpan={6} label="No trades yet" />;
+  }
+
   return (
     <table className="w-full">
       <thead className="border-b border-[#232A38]">
@@ -324,24 +457,30 @@ function TradeHistoryTable() {
           <Th right>Time</Th>
         </tr>
       </thead>
+
       <tbody className="divide-y divide-[#1A1F2B]">
-        {TRADE_HISTORY.map((t, i) => (
-          <tr key={i} className="hover:bg-[#151A24]">
-            <Td className="text-[#E7E9EE]">{t.symbol}</Td>
+        {trades.map((t: any) => (
+          <tr key={t.id} className="hover:bg-[#151A24]">
+            <Td className="text-[#E7E9EE]">{t.market}</Td>
+
             <Td>
-              <SideTag side={t.side} />
+              <SideTag side={t.side.toLowerCase()} />
             </Td>
+
             <Td right className="text-[#C7CCD6]">
-              {t.price.toLocaleString()}
+              {Number(t.price).toLocaleString()}
             </Td>
+
             <Td right className="text-[#C7CCD6]">
-              {t.size}
+              {Number(t.qty)}
             </Td>
+
             <Td right className="text-[#7C8598]">
-              {t.fee.toFixed(2)}
+              {t.fee ?? "-"}
             </Td>
+
             <Td right className="text-[#7C8598]">
-              {t.time}
+              {new Date(t.createdAt).toLocaleString()}
             </Td>
           </tr>
         ))}
@@ -392,19 +531,15 @@ export function PositionsPanel({ symbol }: { symbol: string }) {
             {t.key === "positions" && positions.length > 0 && (
               <span className="ml-1.5 text-[#F5A623]">{positions.length}</span>
             )}
-            {t.key === "open" && OPEN_ORDERS.length > 0 && (
-              <span className="ml-1.5 text-[#F5A623]">
-                {OPEN_ORDERS.length}
-              </span>
-            )}
+            {t.key === "open"}
           </button>
         ))}
       </div>
 
       <div className="overflow-x-auto">
         {tab === "positions" && <PositionsTable positions={positions} />}
-        {tab === "open" && <OpenOrdersTable />}
-        {tab === "history" && <OrderHistoryTable />}
+        {tab === "open" && <OpenOrdersTable symbol={symbol} />}
+        {tab === "history" && <OrderHistoryTable symbol={symbol} />}
         {tab === "trades" && <TradeHistoryTable />}
       </div>
     </div>

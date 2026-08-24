@@ -55,11 +55,13 @@ async function listentoQueue() {
           order!.type,
           order!.orderType,
         );
+        const depth = orderbooks["SOL"];
+        console.log(depth);
         if (!result) {
           lastProcessedId = response[0].messages[0].id;
           continue;
         }
-        const { fills, depthChanges } = result;
+        const { fills, depthChanges, updatedOrders } = result;
         let updateMap: Record<string, Position[]> = {};
         if (fills && fills.length != 0) {
           let updates = createPositions(fills, order!, false);
@@ -77,7 +79,9 @@ async function listentoQueue() {
           type: "dbUpdate",
           fills: JSON.stringify(fills),
           order: JSON.stringify(order),
+          userId: message.userId,
           loopbackid: message.loopbackid,
+          updatedOrders: JSON.stringify(updatedOrders),
         });
         client2.xAdd("from_engine", "*", {
           type: "depthChange",

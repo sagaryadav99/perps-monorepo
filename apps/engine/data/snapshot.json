@@ -10,6 +10,22 @@
         "locked": 0
       },
       "orders": []
+    },
+    {
+      "userId": "c1c14ea2-c099-43fa-a80b-63c2ff53d480",
+      "collateral": {
+        "available": 100000,
+        "locked": 0
+      },
+      "orders": []
+    },
+    {
+      "userId": "ca3fafe5-cb07-4e2e-a804-9da2ceabc3f2",
+      "collateral": {
+        "available": 100000,
+        "locked": 0
+      },
+      "orders": []
     }
   ],
   "positions": [],
