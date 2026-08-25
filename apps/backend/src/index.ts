@@ -47,8 +47,9 @@ app.post("/signin", async (req, res) => {
   const token = jwt.sign({ userid: user.id }, process.env.JWT_SECRET!);
   res.cookie("token", token, {
     httpOnly: process.env.NODE_ENV === "production",
-    secure: false,
+    secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
+    ...(process.env.NODE_ENV === "production" ? { domain: ".mindraw.in" } : {}),
   });
   res.json({ message: `signed in successfully with userid ${user.id}`, token });
 });
