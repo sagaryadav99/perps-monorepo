@@ -8,7 +8,9 @@ export function authmiddleware(
   try {
     const token = req.cookies.token;
     if (!token) {
-      throw new Error("no token provided");
+      return res.status(401).json({
+        message: "no token provided",
+      });
     }
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
     req.userid = decoded.userid;
