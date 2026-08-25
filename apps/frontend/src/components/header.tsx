@@ -37,7 +37,7 @@ export function Header() {
   const logoutMutation = useMutation({
     mutationFn: async () => {
       const { data } = await axios.post(
-        `${API_URL}/onramp`,
+        `${API_URL}/logout`,
         {},
         {
           withCredentials: true,
