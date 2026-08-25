@@ -55,10 +55,11 @@ app.post("/signin", async (req, res) => {
 });
 app.post("/logout", (req, res) => {
   res.clearCookie("token", {
-    httpOnly: true,
-    secure: false,
+    httpOnly: process.env.NODE_ENV === "produciton",
+    secure: process.env.NODE_ENV === "produciton",
     sameSite: "lax",
     path: "/",
+    ...(process.env.NODE_ENV === "production" ? { domain: ".mindraw.in" } : {}),
   });
 
   return res.json({
