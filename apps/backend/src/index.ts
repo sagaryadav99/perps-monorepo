@@ -56,7 +56,7 @@ app.post("/signin", async (req, res) => {
 app.post("/logout", (req, res) => {
   res.clearCookie("token", {
     httpOnly: process.env.NODE_ENV === "produciton",
-    secure: process.env.NODE_ENV === "produciton",
+    secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
     ...(process.env.NODE_ENV === "production" ? { domain: ".mindraw.in" } : {}),
